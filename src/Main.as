@@ -2,6 +2,10 @@ MessageHistory@ messageHistory;
 
 void Main()
 {
+#if DEPENDENCY_NADEOSERVICES
+    NadeoServices::AddAudience("NadeoLiveServices");
+#endif
+    if (setting_recap_show_menu && !recap.started) recap.start();
 #if DEPENDENCY_DISCORD
     if (settings_discord_user_id == "")
     {
