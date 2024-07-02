@@ -32,6 +32,12 @@ namespace DiscordDefaults
             "value": "[Rank]",
             "inline": true
         }
+            ,
+            {
+                "name": "GrindTime",
+                "value": "[GrindTime]",
+                "inline": true
+            }
         ],
         "thumbnail": {
             "url": "[ThumbnailLink]"

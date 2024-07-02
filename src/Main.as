@@ -146,6 +146,7 @@ string GetInterpolatedBody(PB@ pb, string _body)
         parts[i] = Regex::Replace(parts[i], MapAuthorNamePattern, map.AuthorName);
         parts[i] = Regex::Replace(parts[i], MapAuthorLinkPattern, URL::TrackmaniaIOPlayer + map.AuthorLogin);
         parts[i] = Regex::Replace(parts[i], ThumbnailPattern, map.TrackId != 0 ? URL::TrackmaniaExchangeThumbnail + map.TrackId : "");
+        parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Finishes.total);
     }
 
     return string::Join(parts, "[");
