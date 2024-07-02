@@ -1,0 +1,9 @@
+[meta]
+name        = "DiscordClubHook"
+author      = "FabianvZ"
+category    = "Utilities"
+version     = "0.1"
+
+[script]
+dependencies = [ "NadeoServices" ]
+optional_dependencies = [ "ChampionMedals", "Discord" ]
