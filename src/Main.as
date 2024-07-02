@@ -24,6 +24,9 @@ void Main()
             sleep(500);
         }
     }
+    ImportUsernames(DiscordDefaults::usernames);
+    Log(getDiscordUserId("TrackmaniaID"));
+    Log(GetTMName("DiscordId2"));
 #endif
     @messageHistory = MessageHistory();
     startnew(PBLoop);

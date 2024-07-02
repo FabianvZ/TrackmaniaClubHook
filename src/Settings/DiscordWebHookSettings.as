@@ -156,6 +156,12 @@ void RenderDiscordSettings()
         settings_Body = UI::InputTextMultiline("Request body", settings_Body);
 		UI::EndTabItem();
     }
+
+    if (UI::BeginTabItem(Icons::File + " TMUsername : DiscordID"))
+    {
+        settings_usernames = UI::InputTextMultiline("Usernames", usernames);
+        UI::EndTabItem();
+    }
     
     UI::EndTabBar();
 }
@@ -176,6 +182,7 @@ void RenderResetButton()
         settings_at_medal_string = DiscordDefaults::AuthorMedal;
         settings_champion_medal_string = DiscordDefaults::ChampionMedal;
         settings_Body = DiscordDefaults::Body;
+        settings_usernames = DiscordDefaults::usernames;
     }
 }
 
