@@ -118,35 +118,24 @@ string GetInterpolatedBody(PB@ pb, string _body)
 {
     Map@ map = pb.Map;
 
-    string userNamePattern = "\\[UserName\\]";
-    string userLinkPattern = "\\[UserLink\\]";
-    string userDiscordPattern = "\\[UserDiscordId\\]";
-    string TimePattern = "\\[Time\\]";
-    string TimeDeltaPattern = "\\[TimeDelta\\]";
-    string RankPattern = "\\[Rank\\]";
-    string MedalPattern = "\\[Medal\\]";
-    string MapNamePattern = "\\[MapName\\]";
-    string MapLinkPattern = "\\[MapLink\\]";
-    string MapAuthorNamePattern = "\\[MapAuthorName\\]";
-    string MapAuthorLinkPattern = "\\[MapAuthorLink\\]";
-    string ThumbnailPattern = "\\[ThumbnailLink\\]";
-
     array<string> parts = _body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)
     {
-        parts[i] = Regex::Replace(parts[i], userNamePattern, pb.User.Name);
-        parts[i] = Regex::Replace(parts[i], userLinkPattern, URL::TrackmaniaIOPlayer + pb.User.Id);
-        parts[i] = Regex::Replace(parts[i], userDiscordPattern, settings_discord_user_id);
-        parts[i] = Regex::Replace(parts[i], TimePattern, Time::Format(pb.CurrentPB));
-            parts[i] = Regex::Replace(parts[i], TimeDeltaPattern, pb.PreviousPB != uint(-1) ? " (-" + Time::Format(pb.PreviousPB - pb.CurrentPB) + ")" : "");
-        parts[i] = Regex::Replace(parts[i], RankPattern, "" + pb.Position);
-        parts[i] = Regex::Replace(parts[i], MedalPattern, Medal::ToDiscordString(pb.Medal));
-        parts[i] = Regex::Replace(parts[i], MapNamePattern, map.CleansedName);
-        parts[i] = Regex::Replace(parts[i], MapLinkPattern, URL::TrackmaniaIOLeaderboard + map.Uid);
-        parts[i] = Regex::Replace(parts[i], MapAuthorNamePattern, map.AuthorName);
-        parts[i] = Regex::Replace(parts[i], MapAuthorLinkPattern, URL::TrackmaniaIOPlayer + map.AuthorLogin);
-        parts[i] = Regex::Replace(parts[i], ThumbnailPattern, map.TrackId != 0 ? URL::TrackmaniaExchangeThumbnail + map.TrackId : "");
-        parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Finishes.total);
+        parts[i] = Regex::Replace(parts[i], "\\[UserName\\]", pb.User.Name);
+        parts[i] = Regex::Replace(parts[i], "\\[UserLink\\]", URL::TrackmaniaIOPlayer + pb.User.Id);
+        parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", settings_discord_user_id);
+        parts[i] = Regex::Replace(parts[i], "\\[Time\\]", Time::Format(pb.CurrentPB));
+            parts[i] = Regex::Replace(parts[i], "\\[TimeDelta\\]", pb.PreviousPB != uint(-1) ? " (-" + Time::Format(pb.PreviousPB - pb.CurrentPB) + ")" : "");
+        parts[i] = Regex::Replace(parts[i], "\\[Rank\\]", "" + pb.Position);
+        parts[i] = Regex::Replace(parts[i], "\\[Medal\\]", Medal::ToDiscordString(pb.Medal));
+        parts[i] = Regex::Replace(parts[i], "\\[MapName\\]", map.CleansedName);
+        parts[i] = Regex::Replace(parts[i], "\\[MapLink\\]", URL::TrackmaniaIOLeaderboard + map.Uid);
+        parts[i] = Regex::Replace(parts[i], "\\[MapAuthorName\\]", map.AuthorName);
+        parts[i] = Regex::Replace(parts[i], "\\[MapAuthorLink\\]", URL::TrackmaniaIOPlayer + map.AuthorLogin);
+        parts[i] = Regex::Replace(parts[i], "\\[ThumbnailLink\\]", map.TrackId != 0 ? URL::TrackmaniaExchangeThumbnail + map.TrackId : "");
+        parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Timer::to_string(data.timer.session) +  " / " + Timer::to_string(data.timer.total));
+        parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", data.finishes.session +  " / " + data.finishes.total);
+        parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", data.resets.session + " / " + data.resets.total);
     }
 
     return string::Join(parts, "[");

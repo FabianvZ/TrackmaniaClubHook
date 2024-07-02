@@ -36,6 +36,16 @@ namespace DiscordDefaults
             {
                 "name": "GrindTime",
                 "value": "[GrindTime]",
+                "inline": false
+            },
+            {
+                "name": "Finishes",
+                "value": "[Finishes]",
+                "inline": true
+            },
+            {
+                "name": "Resets",
+                "value": "[Resets]",
                 "inline": true
             }
         ],
