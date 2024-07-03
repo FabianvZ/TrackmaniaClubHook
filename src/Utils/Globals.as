@@ -47,6 +47,10 @@ namespace DiscordDefaults
                 "name": "Resets",
                 "value": "[Resets]",
                 "inline": true
+            },
+            {
+                "name": "Club Leaderboard",
+                "value": "[ClubLeaderboard]"
             }
         ],
         "thumbnail": {

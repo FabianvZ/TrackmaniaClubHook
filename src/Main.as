@@ -39,8 +39,7 @@ void PBLoop()
     User@ user = User(app.LocalPlayerInfo);
     uint currentPB;
     uint previousPB;
-
-//    GetClub();
+    Json::Value clubLeaderboard;
 
     while (true)
     {
@@ -59,7 +58,7 @@ void PBLoop()
             @map = Map(currentMap);
             previousPB = GetCurrBestTime(app, map.Uid);
 
-            GetMapLeaderboard("Personal_Best", lastMapUid, GetClub());
+            clubLeaderboard = GetMapLeaderboard("Personal_Best", lastMapUid, GetClub());
             continue;
         }
 
@@ -70,7 +69,7 @@ void PBLoop()
         {
             Log("New PB: " + currentPB + " (" + Time::Format(currentPB - previousPB) + ")");
             PB@ pb = PB(user, map, previousPB, currentPB);
-            Message@ message = CreateDiscordPBMessage(pb);
+            Message@ message = CreateDiscordPBMessage(pb, clubLeaderboard);
             messageHistory.Add(message);
 
             if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
@@ -108,7 +107,7 @@ int GetClub() {
     return pinnedClubId;
 }
 
-void GetMapLeaderboard(string groupUid, string mapUid, int clubId){
+Json::Value GetMapLeaderboard(string groupUid, string mapUid, int clubId){
     Log("Getting map Leaderboard for club");
     auto leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/" + groupUid + "/map/" + mapUid + "/club/" + clubId + "/top?length=100&offset=0");
 
@@ -116,6 +115,7 @@ void GetMapLeaderboard(string groupUid, string mapUid, int clubId){
     string accountId = leaderboard["top"][n]["accountId"];
     Log(accountId + " = " + GetPlayerDisplayName(accountId));
     }
+    return leaderboard;
 }
 
 string GetPlayerDisplayName(const string &in accountId) 
@@ -150,10 +150,10 @@ string GetPlayerDisplayName(const string &in accountId)
 		}
 	}
 
-Message@ CreateDiscordPBMessage(PB@ pb)
+Message@ CreateDiscordPBMessage(PB@ pb, Json::Value clubLeaderboard)
 {     
     string url = settings_discord_URL;
-    string body = GetInterpolatedBody(pb, settings_Body);
+    string body = GetInterpolatedBody(pb, settings_Body, clubLeaderboard);
     DiscordWebHook@ webHook = DiscordWebHook(url, body);
     
     return Message(webHook);
@@ -171,11 +171,12 @@ void SendDiscordWebHook(Message@ message)
     }
 }
 
-string GetInterpolatedBody(PB@ pb, string _body)
+string GetInterpolatedBody(PB@ pb, string _body, Json::Value clubLeaderboard)
 {
     Map@ map = pb.Map;
 
     string discordUserId = getDiscordUserId(pb.User.Name);
+    string clubLeaderboardString = getClubLeaderboard(clubLeaderboard);
     Log(discordUserId);
 
     array<string> parts = _body.Split("[[");
@@ -197,7 +198,22 @@ string GetInterpolatedBody(PB@ pb, string _body)
         parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Timer::to_string(data.timer.session) +  " / " + Timer::to_string(data.timer.total));
         parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", data.finishes.session +  " / " + data.finishes.total);
         parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", data.resets.session + " / " + data.resets.total);
+        parts[i] = Regex::Replace(parts[i], "\\[ClubLeaderboard\\]", clubLeaderboardString);
     }
 
     return string::Join(parts, "[");
+}
+
+string getClubLeaderboard(Json::Value leaderboard) {
+    string result = "";
+    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
+        string accountId = leaderboard["top"][n]["accountId"];
+        string username = GetPlayerDisplayName(accountId);
+        string time = Timer::to_string(leaderboard["top"][n]["score"]);
+        result += (n + 1) + ": " + username + " : " + time;
+        if (n != leaderboard["top"].get_Length() - 1) {
+            result += "\\n";
+        }
+    }
+    return result;
 }
