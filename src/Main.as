@@ -41,6 +41,8 @@ void PBLoop()
     uint currentPB;
     uint previousPB;
 
+    getClub();
+
     while (true)
     {
         // Wait until player is on a map
@@ -93,6 +95,19 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     auto score_manager = app.Network.ClientManiaAppPlayground.ScoreMgr;
     auto user = user_manager.Users[0];
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
+}
+
+void getClub() {
+    Log("Getting club");
+    auto info = Nadeo::LiveServiceRequest("/api/token/club/mine?length=10&offset=0");
+    for( uint n = 0; n < info["clubList"].get_Length(); n++) {
+        Log(info["clubList"][n]["name"]);
+        if (info["clubList"][n]["featured"]) {
+            Log("Featured: true");
+        } else {
+            Log("Featured: false");
+        }
+    }
 }
 
 Message@ CreateDiscordPBMessage(PB@ pb)
