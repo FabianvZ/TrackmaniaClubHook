@@ -25,7 +25,6 @@ void Main()
         }
     }
     ImportUsernames(settings_usernames);
-    Log(getDiscordUserId("Lokulicious"));
 #endif
     @messageHistory = MessageHistory();
     startnew(PBLoop);
@@ -41,7 +40,7 @@ void PBLoop()
     uint currentPB;
     uint previousPB;
 
-    getClub();
+//    GetClub();
 
     while (true)
     {
@@ -59,6 +58,8 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             previousPB = GetCurrBestTime(app, map.Uid);
+
+            GetMapLeaderboard("Personal_Best", lastMapUid, GetClub());
             continue;
         }
 
@@ -97,21 +98,60 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
 }
 
-void getClub() {
+int GetClub() {
     Log("Getting club");
-    auto info = Nadeo::LiveServiceRequest("/api/token/club/mine?length=10&offset=0");
-    for( uint n = 0; n < info["clubList"].get_Length(); n++) {
-        Log(info["clubList"][n]["name"]);
-        if (info["clubList"][n]["featured"]) {
-            Log("Featured: true");
-        } else {
-            Log("Featured: false");
-        }
+    auto info = Nadeo::LiveServiceRequest("/api/token/club/player/info");
+
+    int pinnedClubId = info["pinnedClub"];
+    Log("Clubid is: " + pinnedClubId);
+
+    return pinnedClubId;
+}
+
+void GetMapLeaderboard(string groupUid, string mapUid, int clubId){
+    Log("Getting map Leaderboard for club");
+    auto leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/" + groupUid + "/map/" + mapUid + "/club/" + clubId + "/top?length=100&offset=0");
+
+    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
+    string accountId = leaderboard["top"][n]["accountId"];
+    Log(accountId + " = " + GetPlayerDisplayName(accountId));
     }
 }
 
+string GetPlayerDisplayName(const string &in accountId) 
+    {
+        auto ums = GetApp().UserManagerScript;
+        MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
+        playerIds.Add(accountId);
+       
+        auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
+        while (req.IsProcessing) 
+        {
+            yield();
+        }
+        
+        string[] playerNames = array<string>(playerIds.Length);
+        for (uint i = 0; i < playerIds.Length; i++) 
+        {
+            playerNames[i] = string(req.GetDisplayName(wstring(playerIds[i])));
+        }
+        return playerNames[0];
+    }
+    
+    MwId GetMainUserId() {
+		auto app = cast<CTrackMania>(GetApp());
+		if (app.ManiaPlanetScriptAPI.UserMgr.MainUser !is null) {
+			return app.ManiaPlanetScriptAPI.UserMgr.MainUser.Id;
+		}
+		if (app.ManiaPlanetScriptAPI.UserMgr.Users.Length >= 1) {
+			return app.ManiaPlanetScriptAPI.UserMgr.Users[0].Id;
+		} else {
+			return MwId();
+		}
+	}
+
 Message@ CreateDiscordPBMessage(PB@ pb)
-{
+{     
     string url = settings_discord_URL;
     string body = GetInterpolatedBody(pb, settings_Body);
     DiscordWebHook@ webHook = DiscordWebHook(url, body);

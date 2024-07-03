@@ -19,7 +19,6 @@ void ImportUsernames(string names){
 string getDiscordUserId(string TMUsername){
     for (uint i = 0; i < namesArray.Length; i++)
     {
-        Log(TMUsername + " = " + namesArray[i][0] + "? " + namesArray[i][1]);
         if(namesArray[i][0] == TMUsername){
             return namesArray[i][1];
         }

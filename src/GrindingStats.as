@@ -4,8 +4,13 @@ enum displays {
     Always
 }
 
+
+
 [Setting name="Enabled" category="UI"]
 bool setting_enabled = true;
+
+[Setting name="Selected Club" category="UI"]
+string setting_club = "";
 
 [Setting name="Lock window location" category="UI"]
 bool setting_lock_window_location = false;
