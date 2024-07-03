@@ -199,6 +199,7 @@ string GetInterpolatedBody(PB@ pb, string _body, Json::Value clubLeaderboard)
 
     string discordUserId = getDiscordUserId(pb.User.Name);
     string clubLeaderboardString = getClubLeaderboard(clubLeaderboard);
+    string losers = getLosers(clubLeaderboard, pb);
     Log(discordUserId);
 
     array<string> parts = _body.Split("[[");
@@ -221,6 +222,7 @@ string GetInterpolatedBody(PB@ pb, string _body, Json::Value clubLeaderboard)
         parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", data.finishes.session +  " / " + data.finishes.total);
         parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", data.resets.session + " / " + data.resets.total);
         parts[i] = Regex::Replace(parts[i], "\\[ClubLeaderboard\\]", clubLeaderboardString);
+        parts[i] = Regex::Replace(parts[i], "\\[Losers\\]", losers);
     }
 
     return string::Join(parts, "[");
@@ -235,6 +237,23 @@ string getClubLeaderboard(Json::Value leaderboard) {
         result += (n + 1) + ": " + username + " : " + time;
         if (n != leaderboard["top"].get_Length() - 1) {
             result += "\\n";
+        }
+    }
+    return result;
+}
+
+string getLosers(Json::Value leaderboard, PB@ pb) {
+    string result = "";
+    uint startPos = getPosition(leaderboard, pb.CurrentPB);
+    uint endPos = getLeaderboardPosition(leaderboard, pb.User);
+    for (uint i = startPos; i < endPos; i++) {
+        result += GetPlayerDisplayName(leaderboard["top"][i]["accountId"]);
+        if (i != endPos && endPos - 1 != startPos) {
+            if (i == endPos - 2) {
+                result += " & ";
+            } else {
+                result += ", ";
+            }
         }
     }
     return result;
