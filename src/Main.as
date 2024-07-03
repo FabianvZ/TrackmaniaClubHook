@@ -24,8 +24,8 @@ void Main()
             sleep(500);
         }
     }
-    ImportUsernames(DiscordDefaults::usernames);
-
+    ImportUsernames(settings_usernames);
+    Log(getDiscordUserId("Lokulicious"));
 #endif
     @messageHistory = MessageHistory();
     startnew(PBLoop);
@@ -93,8 +93,6 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     auto score_manager = app.Network.ClientManiaAppPlayground.ScoreMgr;
     auto user = user_manager.Users[0];
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
-
-    
 }
 
 Message@ CreateDiscordPBMessage(PB@ pb)
@@ -123,6 +121,7 @@ string GetInterpolatedBody(PB@ pb, string _body)
     Map@ map = pb.Map;
 
     string discordUserId = getDiscordUserId(pb.User.Name);
+    Log(discordUserId);
 
     array<string> parts = _body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)

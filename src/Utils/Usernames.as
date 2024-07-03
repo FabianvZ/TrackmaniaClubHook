@@ -1,20 +1,25 @@
 array<array<string>> namesArray(100, array<string>(2));
 
 void ImportUsernames(string names){
-    string appendedNames = Regex::Replace(names, "\n", "");
-    array<string> parts = appendedNames.Split(";");
 
-    for (uint i = 0; i < parts.Length - 1; i += 2)
+    array<string> parts = names.Split("\n");
+
+    for (uint i = 0; i < parts.Length; i++)
     {
-
-        namesArray[i][0] = parts[i];
-        namesArray[i][1] = parts[i+1];
+        namesArray[i] = parts[i].Split(";");
     }
+
+    // for (uint i = 0; i < parts.Length - 1; i += 2)
+    // {
+    //     namesArray[i][0] = parts[i];
+    //     namesArray[i][1] = parts[i+1];
+    // }
 }
 
 string getDiscordUserId(string TMUsername){
     for (uint i = 0; i < namesArray.Length; i++)
     {
+        Log(TMUsername + " = " + namesArray[i][0] + "? " + namesArray[i][1]);
         if(namesArray[i][0] == TMUsername){
             return namesArray[i][1];
         }
