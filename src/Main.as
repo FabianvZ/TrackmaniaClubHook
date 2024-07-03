@@ -24,7 +24,11 @@ void Main()
             sleep(500);
         }
     }
+<<<<<<< HEAD
     ImportUsernames(settings_usernames);
+=======
+    ImportUsernames(DiscordDefaults::usernames);
+>>>>>>> origin/main
 
 #endif
     @messageHistory = MessageHistory();
@@ -120,7 +124,11 @@ string GetInterpolatedBody(PB@ pb, string _body)
 {
     Map@ map = pb.Map;
 
+<<<<<<< HEAD
     string discordUserId = getDiscordUserId(pb.User.Name);
+=======
+    string discordUserId = getDiscordUserId(pb.User.Name) + "";
+>>>>>>> origin/main
 
     array<string> parts = _body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)
