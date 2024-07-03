@@ -2,19 +2,23 @@ class PB
 {
     User@ User;
     Map@ Map;
-    uint PreviousPB;
     uint CurrentPB;
+    uint PreviousPB;
     int Position;
     Medal Medal;
+    Leaderboard@ PreviousLeaderboard;
+    Leaderboard@ CurrentLeaderboard;
 
-    PB(User@ user, Map@ map, uint previousPB, uint currentPB)
+    PB(User@ user, Map@ map, uint currentPB, Leaderboard@ previousLeaderboard)
     {
         @User = user;
         @Map = map;
-        PreviousPB = previousPB;
         CurrentPB = currentPB;
         Position = GetPBPosition(Map.Uid, CurrentPB);
         Medal = GetReachedMedal(CurrentPB, Map);
+        @PreviousLeaderboard = previousLeaderboard;
+        PreviousPB = previousLeaderboard.getPB();
+        @CurrentLeaderboard = GetLeaderboard();
     }
 
     int GetPBPosition(const string &in mapUid, uint time)
@@ -48,6 +52,28 @@ class PB
         }
 
         return -1;
+    }
+
+    Leaderboard@ GetLeaderboard()
+    {
+        for (int tries = 0; tries < 10; tries++)
+        {
+            try
+            {
+               Leaderboard@ newLeaderboard = Leaderboard(User, Map);
+
+                if(newLeaderboard.getLeaderboardPosition() == PreviousLeaderboard.getLeaderboardPosition())
+                {
+                    sleep(100 * tries);
+                    continue;
+                }
+
+                return newLeaderboard;
+            }
+            catch {}
+        }
+
+        return Leaderboard(User, Map);
     }
     
     private Medal GetReachedMedal(uint currentPB, Map@ map)

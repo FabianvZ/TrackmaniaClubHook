@@ -100,6 +100,6 @@ bool can_render(RenderMode rendermode) {
 
 
 string format_string(const string &in str) {
-    return setting_show_map_name_color ? ColoredString(str) : StripFormatCodes(str);
+    return setting_show_map_name_color ? Text::StripNonColorFormatCodes(str) : Text::StripFormatCodes(str);
 }
 

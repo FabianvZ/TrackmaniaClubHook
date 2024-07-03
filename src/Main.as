@@ -38,8 +38,7 @@ void PBLoop()
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
     uint currentPB;
-    uint previousPB;
-    Json::Value clubLeaderboard;
+    Leaderboard@ leaderboard;
 
     while (true)
     {
@@ -56,59 +55,32 @@ void PBLoop()
         {
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
-            previousPB = GetCurrBestTime(app, map.Uid);
-
-            clubLeaderboard = GetMapLeaderboard("Personal_Best", lastMapUid, GetClub());
+            @leaderboard = Leaderboard(user, map);
             continue;
         }
 
         currentPB = GetCurrBestTime(app, map.Uid);
 
-        // New PB
-        if (currentPB < previousPB)
-        {
-            if (getPosition(clubLeaderboard, currentPB) < getLeaderboardPosition(clubLeaderboard, user)) {
-                Log("New PB: " + currentPB + " (" + Time::Format(currentPB - previousPB) + ")");
-                PB @pb = PB(user, map, previousPB, currentPB);
-                Message @message = CreateDiscordPBMessage(pb, clubLeaderboard);
-                messageHistory.Add(message);
+        // New club leaderboard place
+        if (currentPB < leaderboard.getPB() && leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition()) {
+            Log("New PB: " + currentPB + " (" + Time::Format(currentPB - leaderboard.getPB()) + ") " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
+            PB @pb = PB(user, map, currentPB, leaderboard);
+            Message @message = CreateDiscordPBMessage(pb);
+            messageHistory.Add(message);
 
-                if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
-                    SendDiscordWebHook(message);
+            if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
+                SendDiscordWebHook(message);
 
-                previousPB = currentPB;
-                clubLeaderboard = GetMapLeaderboard("Personal_Best", lastMapUid, GetClub());
-            }
+            @leaderboard = Leaderboard(user, map);
         }
         
         sleep(1000);
     }
 }
 
-int getLeaderboardPosition(Json::Value leaderboard, User@ user) {
-    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
-        if (leaderboard["top"][n]["accountId"] == user.Id) {
-            return n;
-        }
-    }
-    return -1;
-}
-
-int getPosition(Json::Value leaderboard, uint pb) {
-    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
-        int score = leaderboard["top"][n]["score"];
-        if (pb < score) {
-            return n;
-        }
-    }
-    return -1;
-}
-
 bool IsValidMap(CGameCtnChallenge@ map)
 {
-    if (map is null || map.MapInfo is null) return false;
-
-    return true;
+    return !(map is null || map.MapInfo is null);
 }
 
 uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
@@ -119,63 +91,10 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
 }
 
-int GetClub() {
-    Log("Getting club");
-    auto info = Nadeo::LiveServiceRequest("/api/token/club/player/info");
-
-    int pinnedClubId = info["pinnedClub"];
-    Log("Clubid is: " + pinnedClubId);
-
-    return pinnedClubId;
-}
-
-Json::Value GetMapLeaderboard(string groupUid, string mapUid, int clubId){
-    Log("Getting map Leaderboard for club");
-    auto leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/" + groupUid + "/map/" + mapUid + "/club/" + clubId + "/top?length=100&offset=0");
-
-    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
-    string accountId = leaderboard["top"][n]["accountId"];
-    Log(accountId + " = " + GetPlayerDisplayName(accountId));
-    }
-    return leaderboard;
-}
-
-string GetPlayerDisplayName(const string &in accountId) 
-    {
-        auto ums = GetApp().UserManagerScript;
-        MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
-        playerIds.Add(accountId);
-       
-        auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
-        while (req.IsProcessing) 
-        {
-            yield();
-        }
-        
-        string[] playerNames = array<string>(playerIds.Length);
-        for (uint i = 0; i < playerIds.Length; i++) 
-        {
-            playerNames[i] = string(req.GetDisplayName(wstring(playerIds[i])));
-        }
-        return playerNames[0];
-    }
-    
-    MwId GetMainUserId() {
-		auto app = cast<CTrackMania>(GetApp());
-		if (app.ManiaPlanetScriptAPI.UserMgr.MainUser !is null) {
-			return app.ManiaPlanetScriptAPI.UserMgr.MainUser.Id;
-		}
-		if (app.ManiaPlanetScriptAPI.UserMgr.Users.Length >= 1) {
-			return app.ManiaPlanetScriptAPI.UserMgr.Users[0].Id;
-		} else {
-			return MwId();
-		}
-	}
-
-Message@ CreateDiscordPBMessage(PB@ pb, Json::Value clubLeaderboard)
+Message@ CreateDiscordPBMessage(PB@ pb)
 {     
     string url = settings_discord_URL;
-    string body = GetInterpolatedBody(pb, settings_Body, clubLeaderboard);
+    string body = GetInterpolatedBody(pb, settings_Body);
     DiscordWebHook@ webHook = DiscordWebHook(url, body);
     
     return Message(webHook);
@@ -193,24 +112,50 @@ void SendDiscordWebHook(Message@ message)
     }
 }
 
-string GetInterpolatedBody(PB@ pb, string _body, Json::Value clubLeaderboard)
+string GetPlayerDisplayName(const string &in accountId)
+    {
+        auto ums = GetApp().UserManagerScript;
+        MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
+        playerIds.Add(accountId);
+
+        auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
+        while (req.IsProcessing)
+        {
+            yield();
+        }
+
+        string[] playerNames = array<string>(playerIds.Length);
+        for (uint i = 0; i < playerIds.Length; i++)
+        {
+            playerNames[i] = string(req.GetDisplayName(wstring(playerIds[i])));
+        }
+        return playerNames[0];
+    }
+
+    MwId GetMainUserId() {
+		auto app = cast<CTrackMania>(GetApp());
+		if (app.ManiaPlanetScriptAPI.UserMgr.MainUser !is null) {
+			return app.ManiaPlanetScriptAPI.UserMgr.MainUser.Id;
+		}
+		if (app.ManiaPlanetScriptAPI.UserMgr.Users.Length >= 1) {
+			return app.ManiaPlanetScriptAPI.UserMgr.Users[0].Id;
+		} else {
+			return MwId();
+		}
+	}
+
+string GetInterpolatedBody(PB@ pb, string _body)
 {
     Map@ map = pb.Map;
-
-    string discordUserId = getDiscordUserId(pb.User.Name);
-    string clubLeaderboardString = getClubLeaderboard(clubLeaderboard);
-    string losers = getLosers(clubLeaderboard, pb);
-    Log(discordUserId);
 
     array<string> parts = _body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)
     {
         parts[i] = Regex::Replace(parts[i], "\\[UserName\\]", pb.User.Name);
         parts[i] = Regex::Replace(parts[i], "\\[UserLink\\]", URL::TrackmaniaIOPlayer + pb.User.Id);
-        //parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", settings_discord_user_id);
-        parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", discordUserId);
+        parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", settings_discord_user_id);
         parts[i] = Regex::Replace(parts[i], "\\[Time\\]", Time::Format(pb.CurrentPB));
-            parts[i] = Regex::Replace(parts[i], "\\[TimeDelta\\]", pb.PreviousPB != uint(-1) ? " (-" + Time::Format(pb.PreviousPB - pb.CurrentPB) + ")" : "");
+        parts[i] = Regex::Replace(parts[i], "\\[TimeDelta\\]", pb.PreviousPB != uint(-1) ? " (-" + Time::Format(pb.PreviousPB - pb.CurrentPB) + ")" : "");
         parts[i] = Regex::Replace(parts[i], "\\[Rank\\]", "" + pb.Position);
         parts[i] = Regex::Replace(parts[i], "\\[Medal\\]", Medal::ToDiscordString(pb.Medal));
         parts[i] = Regex::Replace(parts[i], "\\[MapName\\]", map.CleansedName);
@@ -221,40 +166,11 @@ string GetInterpolatedBody(PB@ pb, string _body, Json::Value clubLeaderboard)
         parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Timer::to_string(data.timer.session) +  " / " + Timer::to_string(data.timer.total));
         parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", data.finishes.session +  " / " + data.finishes.total);
         parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", data.resets.session + " / " + data.resets.total);
-        parts[i] = Regex::Replace(parts[i], "\\[ClubLeaderboard\\]", clubLeaderboardString);
-        parts[i] = Regex::Replace(parts[i], "\\[Losers\\]", losers);
+        parts[i] = Regex::Replace(parts[i], "\\[ClubLeaderboard\\]", pb.CurrentLeaderboard.toString());
+        parts[i] = Regex::Replace(parts[i], "\\[Losers\\]", pb.PreviousLeaderboard.getLosers(pb));
     }
 
     return string::Join(parts, "[");
 }
 
-string getClubLeaderboard(Json::Value leaderboard) {
-    string result = "";
-    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
-        string accountId = leaderboard["top"][n]["accountId"];
-        string username = GetPlayerDisplayName(accountId);
-        string time = Timer::to_string(leaderboard["top"][n]["score"]);
-        result += (n + 1) + ": " + username + " : " + time;
-        if (n != leaderboard["top"].get_Length() - 1) {
-            result += "\\n";
-        }
-    }
-    return result;
-}
 
-string getLosers(Json::Value leaderboard, PB@ pb) {
-    string result = "";
-    uint startPos = getPosition(leaderboard, pb.CurrentPB);
-    uint endPos = getLeaderboardPosition(leaderboard, pb.User);
-    for (uint i = startPos; i < endPos; i++) {
-        result += GetPlayerDisplayName(leaderboard["top"][i]["accountId"]);
-        if (i != endPos && endPos - 1 != startPos) {
-            if (i == endPos - 2) {
-                result += " & ";
-            } else {
-                result += ", ";
-            }
-        }
-    }
-    return result;
-}
