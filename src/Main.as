@@ -24,6 +24,8 @@ void Main()
             sleep(500);
         }
     }
+    ImportUsernames(DiscordDefaults::usernames);
+
 #endif
     @messageHistory = MessageHistory();
     startnew(PBLoop);
@@ -93,6 +95,8 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     auto score_manager = app.Network.ClientManiaAppPlayground.ScoreMgr;
     auto user = user_manager.Users[0];
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
+
+    
 }
 
 void getClub() {
@@ -133,12 +137,15 @@ string GetInterpolatedBody(PB@ pb, string _body)
 {
     Map@ map = pb.Map;
 
+    string discordUserId = getDiscordUserId(pb.User.Name);
+
     array<string> parts = _body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)
     {
         parts[i] = Regex::Replace(parts[i], "\\[UserName\\]", pb.User.Name);
         parts[i] = Regex::Replace(parts[i], "\\[UserLink\\]", URL::TrackmaniaIOPlayer + pb.User.Id);
-        parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", settings_discord_user_id);
+        //parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", settings_discord_user_id);
+        parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", discordUserId);
         parts[i] = Regex::Replace(parts[i], "\\[Time\\]", Time::Format(pb.CurrentPB));
             parts[i] = Regex::Replace(parts[i], "\\[TimeDelta\\]", pb.PreviousPB != uint(-1) ? " (-" + Time::Format(pb.PreviousPB - pb.CurrentPB) + ")" : "");
         parts[i] = Regex::Replace(parts[i], "\\[Rank\\]", "" + pb.Position);
