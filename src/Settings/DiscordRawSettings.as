@@ -62,3 +62,6 @@ string settings_champion_medal_string = DiscordDefaults::ChampionMedal;
 
 [Setting hidden]
 string settings_Body = DiscordDefaults::Body;
+
+[Setting hidden]
+string settings_usernames = DiscordDefaults::usernames;

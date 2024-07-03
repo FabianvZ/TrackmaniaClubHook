@@ -159,7 +159,7 @@ void RenderDiscordSettings()
 
     if (UI::BeginTabItem(Icons::File + " TMUsername : DiscordID"))
     {
-        settings_usernames = UI::InputTextMultiline("Usernames", usernames);
+        settings_usernames = UI::InputTextMultiline("Usernames", settings_usernames);
         UI::EndTabItem();
     }
     
