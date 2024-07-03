@@ -56,9 +56,8 @@ namespace DiscordDefaults
     ]
 }""";
 
-    string usernames = """
-TrackmaniaID;DiscordId
-;Lokulicious;237184238602944513""";
+    string usernames = 
+"""TrackmaniaID;DiscordId;Lokulicious;237184238602944513""";
 
 
     string NoMedal = "<:no_medal:1223567676421570601>";

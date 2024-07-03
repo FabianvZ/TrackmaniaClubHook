@@ -1,7 +1,8 @@
 array<array<string>> namesArray(100, array<string>(2));
 
 void ImportUsernames(string names){
-    array<string> parts = names.Split(";");
+    string appendedNames = Regex::Replace(names, "\n", "");
+    array<string> parts = appendedNames.Split(";");
 
     for (uint i = 0; i < parts.Length - 1; i += 2)
     {
