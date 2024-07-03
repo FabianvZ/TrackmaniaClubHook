@@ -67,19 +67,41 @@ void PBLoop()
         // New PB
         if (currentPB < previousPB)
         {
-            Log("New PB: " + currentPB + " (" + Time::Format(currentPB - previousPB) + ")");
-            PB@ pb = PB(user, map, previousPB, currentPB);
-            Message@ message = CreateDiscordPBMessage(pb, clubLeaderboard);
-            messageHistory.Add(message);
+            if (getPosition(clubLeaderboard, currentPB) < getLeaderboardPosition(clubLeaderboard, user)) {
+                Log("New PB: " + currentPB + " (" + Time::Format(currentPB - previousPB) + ")");
+                PB @pb = PB(user, map, previousPB, currentPB);
+                Message @message = CreateDiscordPBMessage(pb, clubLeaderboard);
+                messageHistory.Add(message);
 
-            if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
-                SendDiscordWebHook(message);
+                if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
+                    SendDiscordWebHook(message);
 
-            previousPB = currentPB;
+                previousPB = currentPB;
+                clubLeaderboard = GetMapLeaderboard("Personal_Best", lastMapUid, GetClub());
+            }
         }
         
         sleep(1000);
     }
+}
+
+int getLeaderboardPosition(Json::Value leaderboard, User@ user) {
+    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
+        if (leaderboard["top"][n]["accountId"] == user.Id) {
+            return n;
+        }
+    }
+    return -1;
+}
+
+int getPosition(Json::Value leaderboard, uint pb) {
+    for( uint n = 0; n < leaderboard["top"].get_Length(); n++) {
+        int score = leaderboard["top"][n]["score"];
+        if (pb < score) {
+            return n;
+        }
+    }
+    return -1;
 }
 
 bool IsValidMap(CGameCtnChallenge@ map)
