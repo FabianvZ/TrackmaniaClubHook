@@ -16,7 +16,7 @@ void ImportUsernames(string names){
     // }
 }
 
-string getDiscordUserId(string TMUsername){
+string GetDiscordUserId(string TMUsername){
     for (uint i = 0; i < namesArray.Length; i++)
     {
         if(namesArray[i][0] == TMUsername){
@@ -24,7 +24,7 @@ string getDiscordUserId(string TMUsername){
         }
     }
 
-    return "Username Not Found";
+    return "empty";
 }
 
 
@@ -36,6 +36,6 @@ string GetTMName(string discordUserId){
         }
     }
 
-    return "Username Not Found";
+    return "empty";
 }
 

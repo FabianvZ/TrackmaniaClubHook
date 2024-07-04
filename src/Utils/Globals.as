@@ -65,10 +65,10 @@ namespace DiscordDefaults
 Lokulicious;237184238602944513""";
 
 
-    string NoMedal = "<:no_medal:1223567676421570601>";
-    string BronzeMedal = "<:bronze_medal:1223564781437583381>";
-    string SilverMedal = "<:silver_medal:1223564769491943465>";
-    string GoldMedal = "<:gold_medal:1223564758427369472>";
-    string AuthorMedal = "<:at_medal:1223564741642027079>";
-    string ChampionMedal = "<:champion_medal:1223564726500462632>";
+    string NoMedal = "<:no_medal:1258140533897953383>";
+    string BronzeMedal = "<:bronze_medal:1258140076697714698>";
+    string SilverMedal = "<:silver_medal:1258161706014740641>";
+    string GoldMedal = "<:gold_medal:1258139948301943015>";
+    string AuthorMedal = "<:author_medal:1258140024663445575>";
+    string ChampionMedal = "<:champion_medal:1258164329576923248>";
 }
