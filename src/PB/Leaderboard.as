@@ -16,6 +16,10 @@ class Leaderboard {
         uint endPos = getLeaderboardPosition();
         for (uint i = startPos; i < endPos; i++) {
             result += leaderboard["top"][i]["accountId"];
+            if(GetDiscordUserId(result) != "empty"){
+                result = "<@" + GetDiscordUserId(result) + ">";
+            }
+
             if (i != endPos && endPos - 1 != startPos) {
                 if (i == endPos - 2) {
                     result += " & ";
