@@ -3,7 +3,8 @@ name        = "DiscordClubHook"
 author      = "FabianvZ"
 category    = "Utilities"
 version     = "0.1"
+blocks      = ["GrindingStats"]
 
 [script]
-dependencies = [ "NadeoServices" ]
+dependencies = [ "NadeoServices"]
 optional_dependencies = [ "ChampionMedals", "Discord" ]
