@@ -12,16 +12,10 @@ class Leaderboard {
 
     string getLosers(PB@ pb) {
         string result = "";
-        string loserName = "";
         uint startPos = getPosition(pb.CurrentPB);
         uint endPos = getLeaderboardPosition();
         for (uint i = startPos; i < endPos; i++) {
-            loserName = leaderboard["top"][i]["accountId"];
-            if(GetDiscordUserId(loserName) != "empty"){
-                result += "<@" + GetDiscordUserId(loserName) + ">";
-            } else {
-                result += leaderboard["top"][i]["accountId"];
-            }
+            result += GetDiscordUserId(leaderboard["top"][i]["accountId"]);
 
             if (i != endPos && endPos - 1 != startPos) {
                 if (i == endPos - 2) {

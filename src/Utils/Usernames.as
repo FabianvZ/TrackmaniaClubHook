@@ -8,25 +8,24 @@ void ImportUsernames(string names){
     {
         namesArray[i] = parts[i].Split(";");
     }
+    Log("Loaded " + parts.Length + " discordIds:");
 
-    // for (uint i = 0; i < parts.Length - 1; i += 2)
-    // {
-    //     namesArray[i][0] = parts[i];
-    //     namesArray[i][1] = parts[i+1];
-    // }
+    for (uint i = parts.Length; i < 100; i++) {
+        namesArray[i][0] = "";
+        namesArray[i][1] = "";
+    }
 }
 
 string GetDiscordUserId(string TMUsername){
     for (uint i = 0; i < namesArray.Length; i++)
     {
         if(namesArray[i][0] == TMUsername){
-            return namesArray[i][1];
+            return "<@" + namesArray[i][1] + ">";
         }
     }
 
-    return "empty";
+    return TMUsername;
 }
-
 
 string GetTMName(string discordUserId){
     for (uint i = 0; i < namesArray.Length; i++)
@@ -38,4 +37,3 @@ string GetTMName(string discordUserId){
 
     return "empty";
 }
-
