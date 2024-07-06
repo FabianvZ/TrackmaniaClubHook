@@ -64,7 +64,7 @@ class PB
 
                 if(newLeaderboard.getLeaderboardPosition() == PreviousLeaderboard.getLeaderboardPosition())
                 {
-                    sleep(100 * tries);
+                    sleep(250 * tries);
                     continue;
                 }
 
