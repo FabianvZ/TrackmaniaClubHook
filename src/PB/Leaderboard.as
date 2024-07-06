@@ -71,7 +71,7 @@ class Leaderboard {
 
     uint getLeaderboardPosition() {
         for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
-            if (leaderboard["top"][i]["accountId"] == User.Id) {
+            if (leaderboard["top"][i]["accountId"] == User.Name) {
                 return i;
             }
         }
