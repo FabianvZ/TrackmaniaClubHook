@@ -2,7 +2,7 @@
 name        = "Discord Rivalry Ping"
 author      = "FabianvZ, Lokulicious"
 category    = "Utilities"
-version     = "0.1"
+version     = "0.2"
 blocks      = ["GrindingStats"]
 
 [script]
