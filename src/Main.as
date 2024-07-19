@@ -24,7 +24,6 @@ void Main()
             sleep(500);
         }
     }
-    ImportUsernames(settings_usernames);
 #endif
     @messageHistory = MessageHistory();
     startnew(PBLoop);
