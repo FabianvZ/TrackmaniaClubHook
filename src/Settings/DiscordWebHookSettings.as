@@ -124,6 +124,9 @@ void RenderDiscordSettings()
 		UI::EndTabItem();
     }
 
+    UI::Text("Discord ping setting");
+    settings_usernames = UI::InputTextMultiline("Usernames", settings_usernames);
+
     UI::EndTabBar();
 
 #if SIG_DEVELOPER
@@ -155,12 +158,6 @@ void RenderDiscordSettings()
     {
         settings_Body = UI::InputTextMultiline("Request body", settings_Body);
 		UI::EndTabItem();
-    }
-
-    if (UI::BeginTabItem(Icons::File + " TMUsername ; DiscordID"))
-    {
-        settings_usernames = UI::InputTextMultiline("Usernames", settings_usernames);
-        UI::EndTabItem();
     }
     
     UI::EndTabBar();
