@@ -69,3 +69,5 @@ string settings_usernames = DiscordDefaults::usernames;
 bool showImportPopup = false;
 
 string import_settings_usernames = "";
+
+string import_error_message = "";

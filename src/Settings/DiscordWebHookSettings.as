@@ -135,8 +135,6 @@ void RenderDiscordSettings()
     {
         array<string> nameParts = parts[i].Split(";");
 
-        Log(i + ": " + parts[i]);
-
         UI::SetNextItemWidth(300);
         parts[i] = UI::InputText("##TrackmaniaUsername" + i, nameParts[0]) + ";";
         UI::SameLine();
@@ -172,13 +170,19 @@ void RenderDiscordSettings()
     }
 
     if (showImportPopup) {
-        UI::Begin("My Popup", showImportPopup, UI::WindowFlags::NoResize | UI::WindowFlags::AlwaysAutoResize);
+        UI::Begin("Import Discord ping settings popup", showImportPopup, UI::WindowFlags::NoResize | UI::WindowFlags::AlwaysAutoResize);
         import_settings_usernames = UI::InputTextMultiline("##newSettings_usernames", import_settings_usernames);
+        UI::Text(import_error_message);
 
         if (UI::Button("Import")) {
-            showImportPopup = false;
-            settings_usernames = import_settings_usernames;
-            import_settings_usernames = "";
+            if (!Contains(import_settings_usernames.Split("\n"), ";")) {
+                import_error_message = "Import text not valid";
+            } else {
+                showImportPopup = false;
+                settings_usernames = import_settings_usernames;
+                import_settings_usernames = "";
+                import_error_message = "";
+            }
         }
         if (UI::Button("Close")) {
             showImportPopup = false;
