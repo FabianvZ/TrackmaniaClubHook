@@ -65,3 +65,7 @@ string settings_Body = DiscordDefaults::Body;
 
 [Setting hidden]
 string settings_usernames = DiscordDefaults::usernames;
+
+bool showImportPopup = false;
+
+string import_settings_usernames = "";

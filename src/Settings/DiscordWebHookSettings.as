@@ -124,8 +124,68 @@ void RenderDiscordSettings()
 		UI::EndTabItem();
     }
 
-    UI::Text("Discord ping setting");
-    settings_usernames = UI::InputTextMultiline("Usernames", settings_usernames);
+    UI::SetNextItemWidth(300);
+    UI::Text("Trackmania username");
+    UI::SameLine();
+    UI::SetNextItemWidth(200);
+    UI::Text("Discord user ID");
+
+    array<string> parts = settings_usernames.Split("\n");
+    for (uint i = 0; i < parts.Length; i++)
+    {
+        array<string> nameParts = parts[i].Split(";");
+
+        Log(i + ": " + parts[i]);
+
+        UI::SetNextItemWidth(300);
+        parts[i] = UI::InputText("##TrackmaniaUsername" + i, nameParts[0]) + ";";
+        UI::SameLine();
+
+        UI::SetNextItemWidth(200);
+        parts[i] += UI::InputText("##DiscordID" + i, nameParts[1]);
+
+        UI::SameLine();
+        if (UI::ButtonColored(Icons::Trash + "##" + i, 0.0f)) {
+            parts.RemoveAt(i);
+            i--;
+        }
+    }
+    settings_usernames = string::Join(parts, "\n");
+
+    UI::SetNextItemWidth(300);
+    string newTrackmaniaUsername = UI::InputText("##TrackmaniaUsername" + parts.Length, "");
+    UI::SameLine();
+    UI::SetNextItemWidth(200);
+    string newDiscordID = UI::InputText("##DiscordID" + parts.Length, "");
+    if (newTrackmaniaUsername.get_Length() > 0 || newDiscordID.get_Length() > 0) {
+        settings_usernames += "\n" + newTrackmaniaUsername + ";" + newDiscordID;
+    }
+
+    if (UI::Button(Icons::Clipboard	 + " export discord ping settings"))
+    {
+        IO::SetClipboard(settings_usernames);
+    }
+    UI::SameLine();
+    if (UI::Button(Icons::Clipboard	 + " import discord ping settings"))
+    {
+        showImportPopup = true;
+    }
+
+    if (showImportPopup) {
+        UI::Begin("My Popup", showImportPopup, UI::WindowFlags::NoResize | UI::WindowFlags::AlwaysAutoResize);
+        import_settings_usernames = UI::InputTextMultiline("##newSettings_usernames", import_settings_usernames);
+
+        if (UI::Button("Import")) {
+            showImportPopup = false;
+            settings_usernames = import_settings_usernames;
+            import_settings_usernames = "";
+        }
+        if (UI::Button("Close")) {
+            showImportPopup = false;
+        }
+
+        UI::End();
+    }
 
     UI::EndTabBar();
 
