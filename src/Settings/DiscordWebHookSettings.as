@@ -136,13 +136,13 @@ void RenderDiscordSettings()
         array<string> nameParts = parts[i].Split(";");
 
         UI::SetNextItemWidth(300);
-        parts[i] = UI::InputText("##TrackmaniaUsername" + i, nameParts[0]) + ";";
+        parts[i] = UI::InputText("##TrackmaniaUsername" + i, nameParts.Length > 0 ? nameParts[0] : "") + ";";
         UI::SameLine();
 
         UI::SetNextItemWidth(200);
-        parts[i] += UI::InputText("##DiscordID" + i, nameParts[1]);
-
-        UI::SameLine();
+	parts[i] += UI::InputText("##DiscordID" + i, nameParts.Length > 1 ? nameParts[1] : "");
+        
+	UI::SameLine();
         if (UI::ButtonColored(Icons::Trash + "##" + i, 0.0f)) {
             parts.RemoveAt(i);
             i--;
