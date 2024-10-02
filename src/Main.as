@@ -42,7 +42,7 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    uint currentPB;
+    uint previousPB;
     Leaderboard@ leaderboard;
 
     while (true)
@@ -61,24 +61,28 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             @leaderboard = Leaderboard(user, map);
+            previousPB = GetCurrBestTime(app, map.Uid);
             continue;
         }
 
-        currentPB = GetCurrBestTime(app, map.Uid);
+        uint currentPB = GetCurrBestTime(app, map.Uid);
 
         // New club leaderboard place
-        if (currentPB < leaderboard.getPB() && leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition()) {
-            Log("New PB: " + currentPB + " (" + Time::Format(currentPB - leaderboard.getPB()) + ") " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
-            PB @pb = PB(user, map, currentPB, leaderboard);
-            Message @message = CreateDiscordPBMessage(pb);
-            messageHistory.Add(message);
+        if (currentPB < previousPB) {
+            Log("New PB: " + previousPB + " -> " + currentPB);
+            if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition()) {
+                Log("New leaderboard position: " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
+                PB @pb = PB(user, map, currentPB, leaderboard);
+                Message @message = CreateDiscordPBMessage(pb);
+                messageHistory.Add(message);
 
-            if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
-                SendDiscordWebHook(message);
+                if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
+                    SendDiscordWebHook(message);
 
-            @leaderboard = Leaderboard(user, map);
+                @leaderboard = Leaderboard(user, map);
+                previousPB = currentPB;
+            }
         }
-        
         sleep(1000);
     }
 }
