@@ -2,10 +2,16 @@ MessageHistory@ messageHistory;
 
 void Main()
 {
-#if DEPENDENCY_NADEOSERVICES
-    NadeoServices::AddAudience("NadeoLiveServices");
+#if TURBO
+	startnew(CoroutineFunc(TurboSTM::LoadSuperTimes));
 #endif
-    if (setting_recap_show_menu && !recap.started) recap.start();
+#if DEPENDENCY_NADEOSERVICES
+	NadeoServices::AddAudience("NadeoLiveServices");
+#endif
+	if (setting_recap_show_menu && !recap.started)
+		recap.start();
+
+	migrateOldData();
 #if DEPENDENCY_DISCORD
     if (settings_discord_user_id == "")
     {
@@ -162,7 +168,7 @@ string GetInterpolatedBody(PB@ pb, string _body)
         parts[i] = Regex::Replace(parts[i], "\\[MapAuthorName\\]", map.AuthorName);
         parts[i] = Regex::Replace(parts[i], "\\[MapAuthorLink\\]", URL::TrackmaniaIOPlayer + map.AuthorLogin);
         parts[i] = Regex::Replace(parts[i], "\\[ThumbnailLink\\]", map.TrackId != 0 ? URL::TrackmaniaExchangeThumbnail + map.TrackId : "");
-        parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Timer::to_string(data.timer.session) +  " / " + Timer::to_string(data.timer.total));
+        parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Time::Format(data.get_timer().session) +  " / " + Time::Format(data.get_timer().total));
         parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", data.finishes.session +  " / " + data.finishes.total);
         parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", data.resets.session + " / " + data.resets.total);
         parts[i] = Regex::Replace(parts[i], "\\[ClubLeaderboard\\]", pb.CurrentLeaderboard.toString());

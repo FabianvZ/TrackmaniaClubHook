@@ -9,6 +9,7 @@ class WebHook
 
     WebHook(Net::HttpMethod method, const string &in url, Json::Value headers, const string &in body, bool addHost = true, bool addContentLength = true)
     {
+        Log("Body: " + body);
         Method = method;
         URL = url;
         Headers = headers;

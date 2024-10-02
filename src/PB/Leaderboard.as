@@ -32,7 +32,7 @@ class Leaderboard {
         string result = "";
         for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
             string username = leaderboard["top"][i]["accountId"];
-            string time = Timer::to_string(leaderboard["top"][i]["score"]);
+            string time = Time::Format(leaderboard["top"][i]["score"]);
             result += (i + 1) + ": " + username + " : " + time;
             if (i != leaderboard["top"].get_Length() - 1) {
                 result += "\\n";
