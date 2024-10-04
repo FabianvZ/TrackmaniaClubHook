@@ -100,12 +100,12 @@ void SendDiscordWebHook(PB@ pb)
 {
     Log("Sending Message to DiscordWebHook");
     string body = GetInterpolatedBody(pb, settings_Body);
-    Networking::Response@ response = DiscordWebHook(settings_discord_URL, body).Send();
+    Net::HttpRequest@ response = DiscordWebHook(settings_discord_URL, body).Send();
 
-    if (response.StatusCode != 204)
+    if (response.ResponseCode() != 204)
     {
-        error("Sending message to hook was not successfull. Status:" + response.StatusCode);
-        error(response.ErrorMessage);
+        error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
+        error(response.Error());
     }
 }
 

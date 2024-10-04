@@ -5,6 +5,11 @@ namespace Nadeo
         while (!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 
         auto req = NadeoServices::Get("NadeoLiveServices", NadeoServices::BaseURLLive() + route);
-        return Web::Request(req);
+
+        req.Start();
+
+        while(!req.Finished()) yield();
+
+        return Json::Parse(req.String());
     }
 }
