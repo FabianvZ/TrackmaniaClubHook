@@ -1,13 +1,13 @@
 class Message
 {
-    WebHook@ WebHook;
+    DiscordWebHook@ WebHook;
     uint64 CreatedAt;
     bool Sent = false;
     uint64 SentAt;
     bool Completed = false;
     Networking::Response@ response;
 
-    Message(WebHook@ webHook)
+    Message(DiscordWebHook@ webHook)
     {
         @WebHook = webHook;
         CreatedAt = Time::Now;

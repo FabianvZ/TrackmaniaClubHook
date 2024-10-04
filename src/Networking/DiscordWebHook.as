@@ -1,4 +1,4 @@
-class WebHook
+class DiscordWebHook
 {
     Net::HttpMethod Method;
     string URL;
@@ -7,15 +7,15 @@ class WebHook
     bool AddHost;
     bool AddContentLength;
 
-    WebHook(Net::HttpMethod method, const string &in url, Json::Value headers, const string &in body, bool addHost = true, bool addContentLength = true)
+    DiscordWebHook(const string &in url, const string &in body)
     {
         Log("Body: " + body);
-        Method = method;
+        Method = Net::HttpMethod::Post;
         URL = url;
-        Headers = headers;
+        Headers = Json::Parse(DiscordDefaults::Header);
         Body = body;
-        AddHost = addHost;
-        AddContentLength = addContentLength;
+        AddHost = true;
+        AddContentLength = true;
     }
 
     private Net::HttpRequest@ CreateReq()

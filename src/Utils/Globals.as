@@ -3,10 +3,7 @@ namespace DiscordDefaults
     string UserId = "";
     string URL = "https://discord.com/api/webhooks/";
 
-    string Header = """
-{
-    "Content-Type": "application/json"
-}""";
+    string Header = "{\"Content-Type\": \"application/json\"}";
 
     string Body = """
 {
@@ -60,9 +57,7 @@ namespace DiscordDefaults
     ]
 }""";
 
-    string usernames = 
-"""TrackmaniaID;DiscordId
-Lokulicious;237184238602944513""";
+    string usernames = "Lokulicious;237184238602944513";
 
 
     string NoMedal = "<:no_medal:1258140533897953383>";
