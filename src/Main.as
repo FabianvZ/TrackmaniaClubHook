@@ -64,10 +64,14 @@ void PBLoop()
 
         uint currentPB = GetCurrBestTime(app, map.Uid);
 
+        if (force_send_pb) {
+            currentPB = 1;
+        }
+
         // New club leaderboard place
-        if (currentPB < previousPB || force_send_pb) {
+        if (currentPB < previousPB) {
             Log("New PB: " + previousPB + " -> " + currentPB);
-            if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition() || force_send_pb) {
+            if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition()) {
                 Log("New leaderboard position: " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
                 PB @pb = PB(user, map, currentPB, leaderboard);
 
