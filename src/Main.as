@@ -68,9 +68,9 @@ void PBLoop()
         uint currentPB = GetCurrBestTime(app, map.Uid);
 
         // New club leaderboard place
-        if (currentPB < previousPB) {
+        if (currentPB < previousPB || force_send_pb) {
             Log("New PB: " + previousPB + " -> " + currentPB);
-            if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition()) {
+            if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition() || force_send_pb) {
                 Log("New leaderboard position: " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
                 PB @pb = PB(user, map, currentPB, leaderboard);
                 Message @message = CreateDiscordPBMessage(pb);
@@ -81,6 +81,7 @@ void PBLoop()
 
                 @leaderboard = Leaderboard(user, map);
                 previousPB = currentPB;
+                force_send_pb = false;
             }
         }
         sleep(1000);

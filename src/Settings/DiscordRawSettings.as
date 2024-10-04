@@ -66,6 +66,14 @@ string settings_Body = DiscordDefaults::Body;
 [Setting hidden]
 string settings_usernames = DiscordDefaults::usernames;
 
+[Setting hidden]
+bool settings_debug_log = true;
+
+#if SIG_DEVELOPER
+[Setting name="Send PB" category="Testing"]
+#endif
+bool force_send_pb = false;
+
 bool showImportPopup = false;
 
 string import_settings_usernames = "";
