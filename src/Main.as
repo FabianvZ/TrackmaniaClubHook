@@ -1,5 +1,3 @@
-MessageHistory@ messageHistory;
-
 void Main()
 {
 #if TURBO
@@ -31,7 +29,6 @@ void Main()
         }
     }
 #endif
-    @messageHistory = MessageHistory();
     startnew(PBLoop);
 }
 
@@ -73,11 +70,9 @@ void PBLoop()
             if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition() || force_send_pb) {
                 Log("New leaderboard position: " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
                 PB @pb = PB(user, map, currentPB, leaderboard);
-                Message @message = CreateDiscordPBMessage(pb);
-                messageHistory.Add(message);
 
                 if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
-                    SendDiscordWebHook(message);
+                    SendDiscordWebHook(pb);
 
                 @leaderboard = Leaderboard(user, map);
                 previousPB = currentPB;
@@ -101,19 +96,11 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
 }
 
-Message@ CreateDiscordPBMessage(PB@ pb)
-{     
-    string url = settings_discord_URL;
-    string body = GetInterpolatedBody(pb, settings_Body);
-    DiscordWebHook@ webHook = DiscordWebHook(url, body);
-    
-    return Message(webHook);
-}
-
-void SendDiscordWebHook(Message@ message)
+void SendDiscordWebHook(PB@ pb)
 {
     Log("Sending Message to DiscordWebHook");
-    Networking::Response@ response = message.Send();
+    string body = GetInterpolatedBody(pb, settings_Body);
+    Networking::Response@ response = DiscordWebHook(settings_discord_URL, body).Send();
 
     if (response.StatusCode != 204)
     {
