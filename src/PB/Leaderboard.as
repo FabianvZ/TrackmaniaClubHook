@@ -4,11 +4,34 @@ class Leaderboard {
     User@ User;
     Map@ Map;
 
+    Leaderboard(User@ user, Map@ map, int score)
+    {
+        @User = user;
+        @Map = map;
+        leaderboard = GetMapLeaderboard();
+        // Insert new time into leaderboard without waiting for it to update
+        int currentPosition = getLeaderboardPosition();
+        if (currentPosition == leaderboard["top"].Length) 
+        {
+            Json::Value myRecord = Json::Object();
+            myRecord["accountId"] = user.Name;
+            leaderboard["top"].Add(myRecord);
+        }
+        leaderboard["top"][currentPosition]["score"] = score;
+        for (int i = currentPosition; i > getPosition(score); i--)
+        {
+            Json::Value temp = leaderboard["top"][i - 1];
+            leaderboard["top"][i - 1] = leaderboard["top"][i];
+            leaderboard["top"][i] = temp;
+        }
+    }
+
     Leaderboard(User@ user, Map@ map) {
         @User = user;
         @Map = map;
         leaderboard = GetMapLeaderboard();
     }
+    
 
     string getLosers(PB@ pb) {
         string result = "";

@@ -18,7 +18,7 @@ class PB
         Medal = GetReachedMedal(CurrentPB, Map);
         @PreviousLeaderboard = previousLeaderboard;
         PreviousPB = previousLeaderboard.getPB();
-        @CurrentLeaderboard = GetLeaderboard();
+        @CurrentLeaderboard = Leaderboard(User, Map, currentPB);
     }
 
     int GetPBPosition(const string &in mapUid, uint time)
@@ -54,28 +54,6 @@ class PB
         return -1;
     }
 
-    Leaderboard@ GetLeaderboard()
-    {
-        for (int tries = 0; tries < 10; tries++)
-        {
-            try
-            {
-               Leaderboard@ newLeaderboard = Leaderboard(User, Map);
-
-                if(newLeaderboard.getLeaderboardPosition() == PreviousLeaderboard.getLeaderboardPosition())
-                {
-                    sleep(250 * tries);
-                    continue;
-                }
-
-                return newLeaderboard;
-            }
-            catch {}
-        }
-
-        return Leaderboard(User, Map);
-    }
-    
     private Medal GetReachedMedal(uint currentPB, Map@ map)
     {
 #if DEPENDENCY_CHAMPIONMEDALS
