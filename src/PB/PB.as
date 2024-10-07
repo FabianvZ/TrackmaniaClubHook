@@ -1,24 +1,19 @@
 class PB
 {
-    User@ User;
     Map@ Map;
-    uint CurrentPB;
-    uint PreviousPB;
-    int Position;
+    User@ User;
     Medal Medal;
-    Leaderboard@ PreviousLeaderboard;
-    Leaderboard@ CurrentLeaderboard;
+    Leaderboard@ Leaderboard;
+    uint PreviousScore, Position;
 
-    PB(User@ user, Map@ map, uint currentPB, Leaderboard@ previousLeaderboard)
+    PB(User@ user, Map@ map, uint previousScore, Leaderboard@ leaderboard)
     {
         @User = user;
         @Map = map;
-        CurrentPB = currentPB;
-        Position = GetPBPosition(Map.Uid, CurrentPB);
-        Medal = GetReachedMedal(CurrentPB, Map);
-        @PreviousLeaderboard = previousLeaderboard;
-        PreviousPB = previousLeaderboard.getPB();
-        @CurrentLeaderboard = Leaderboard(User, Map, currentPB);
+        Position = GetPBPosition(Map.Uid, leaderboard.getScore());
+        Medal = GetReachedMedal(Map, leaderboard.getScore());
+        PreviousScore = previousScore;
+        @Leaderboard = leaderboard;
     }
 
     int GetPBPosition(const string &in mapUid, uint time)
@@ -54,7 +49,7 @@ class PB
         return -1;
     }
 
-    private Medal GetReachedMedal(uint currentPB, Map@ map)
+    private Medal GetReachedMedal(Map@ map, uint currentPB)
     {
 #if DEPENDENCY_CHAMPIONMEDALS
         if (currentPB <= map.ChampionMedalTime) return Medal::Champion;

@@ -39,16 +39,14 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    uint previousPB;
     Leaderboard@ leaderboard;
 
     while (true)
     {
         // Wait until player is on a map
-        while (!IsValidMap(currentMap))
+        while (currentMap is null || currentMap.MapInfo is null)
         {
             sleep(3000);
-            @app = cast<CTrackMania@>(GetApp());
             @currentMap = app.RootMap;
         }
 
@@ -57,39 +55,32 @@ void PBLoop()
         {
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
-            @leaderboard = Leaderboard(user, map);
-            previousPB = GetCurrBestTime(app, map.Uid);
+            @leaderboard = Leaderboard(user, map, GetCurrBestTime(app, map.Uid));
             continue;
         }
 
         uint currentPB = GetCurrBestTime(app, map.Uid);
 
         if (force_send_pb) {
+            force_send_pb = false;
             currentPB = 1;
         }
 
-        // New club leaderboard place
-        if (currentPB < previousPB) {
-            Log("New PB: " + previousPB + " -> " + currentPB);
-            if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition()) {
-                Log("New leaderboard position: " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
-                PB @pb = PB(user, map, currentPB, leaderboard);
+        if (leaderboard.getScore() > currentPB) {
+            int previousScore = leaderboard.getScore();
+            leaderboard = Leaderboard(user, map, currentPB);
+            
+            if (leaderboard.getPosition(currentPB) < leaderboard.getPosition(previousScore)) {
+                Log("New leaderboard position: " + leaderboard.getPosition(previousScore) + " -> " + (leaderboard.getPosition(currentPB) - 1));
+                PB @pb = PB(user, map, previousScore, leaderboard);
 
                 if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
                     SendDiscordWebHook(pb);
 
-                @leaderboard = Leaderboard(user, map);
-                previousPB = currentPB;
-                force_send_pb = false;
             }
         }
         sleep(1000);
     }
-}
-
-bool IsValidMap(CGameCtnChallenge@ map)
-{
-    return !(map is null || map.MapInfo is null);
 }
 
 uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
