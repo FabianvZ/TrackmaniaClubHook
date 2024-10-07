@@ -10,7 +10,7 @@ void RenderDiscordSettings()
 
     UI::Text("Club");
     string currentClub ;
-    for (int i = 0; clubs.HasKey("clubList") &&  i < clubs["clubList"].Length; i++)
+    for (uint i = 0; clubs.HasKey("clubList") &&  i < clubs["clubList"].Length; i++)
     {
         if (clubs["clubList"][i]["id"] == clubId)
         {
@@ -21,7 +21,7 @@ void RenderDiscordSettings()
     }
     if (UI::BeginCombo("##ClubComboBox", currentClub))
     {
-        for (int i = 0; clubs.HasKey("clubList") && i < clubs["clubList"].Length; i++)
+        for (uint i = 0; clubs.HasKey("clubList") && i < clubs["clubList"].Length; i++)
         {
             string clubname = clubs["clubList"][i]["name"];
             int clubID = clubs["clubList"][i]["id"];
@@ -153,6 +153,8 @@ void RenderDiscordSettings()
 
 		UI::EndTabItem();
     }
+
+    UI::Separator();
 
     UI::SetNextItemWidth(300);
     UI::Text("Trackmania username");

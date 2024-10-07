@@ -29,8 +29,17 @@ void Main()
         }
     }
 #endif
-    clubs = Nadeo::LiveServiceRequest("/api/token/club/mine?length=100&offset=0");
-    reloadclubs = clubId == -1;
+    if (clubId == -1)
+    {
+        clubId = Nadeo::LiveServiceRequest("/api/token/club/player/info")["pinnedClub"];
+    }    
+    if (settings_discord_URL == DiscordDefaults::URL)
+    {
+        UI::ShowNotification(
+				"Discord Rivalry Ping",
+				"Discord webhook is not set in settings. This is needed to send leaderboards!",
+				UI::HSV(0.10f, 1.0f, 1.0f), 7500);
+    }
     startnew(PBLoop);
 }
 

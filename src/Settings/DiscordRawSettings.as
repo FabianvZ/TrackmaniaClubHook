@@ -72,7 +72,7 @@ bool settings_debug_log = true;
 [Setting hidden]
 int clubId = -1;
 Json::Value clubs = Json::Object();
-bool reloadclubs = false;
+bool reloadclubs = true;
 
 #if SIG_DEVELOPER
 [Setting name="Send PB" category="Testing"]
