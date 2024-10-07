@@ -29,6 +29,8 @@ void Main()
         }
     }
 #endif
+    clubs = Nadeo::LiveServiceRequest("/api/token/club/mine?length=100&offset=0");
+    reloadclubs = clubId == -1;
     startnew(PBLoop);
 }
 
@@ -43,11 +45,19 @@ void PBLoop()
 
     while (true)
     {
+
+        if (reloadclubs)
+        {
+            clubs = Nadeo::LiveServiceRequest("/api/token/club/mine?length=100&offset=0");
+            reloadclubs = false;
+        }
+
         // Wait until player is on a map
-        while (currentMap is null || currentMap.MapInfo is null)
+        if (currentMap is null || currentMap.MapInfo is null)
         {
             sleep(3000);
             @currentMap = app.RootMap;
+            continue;
         }
 
         // Map changed

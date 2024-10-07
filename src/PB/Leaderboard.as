@@ -6,7 +6,7 @@ class Leaderboard {
     Leaderboard(User@ user, Map@ map, uint score)
     {
         this.score = score;
-        leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + map.Uid + "/club/" + user.PinnedClub + "/top?length=100&offset=0");
+        leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + map.Uid + "/club/" + clubId + "/top?length=100&offset=0");
         // Replace trackmania user ids with trackmania usernames
         for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
             leaderboard["top"][i]["accountId"] = GetPlayerDisplayName(leaderboard["top"][i]["accountId"]);
@@ -20,7 +20,7 @@ class Leaderboard {
             leaderboard["top"].Add(myRecord);
         }
         leaderboard["top"][currentPosition]["score"] = score;
-        for (int i = currentPosition; i > getPosition(score); i--)
+        for (uint i = currentPosition; i > getPosition(score); i--)
         {
             Json::Value temp = leaderboard["top"][i - 1];
             leaderboard["top"][i - 1] = leaderboard["top"][i];
