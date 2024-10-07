@@ -10,7 +10,7 @@ void RenderDiscordSettings()
 
     UI::Text("Club");
     string currentClub ;
-    for (int i = 0; i < clubs["clubList"].Length; i++)
+    for (int i = 0; clubs.HasKey("clubList") &&  i < clubs["clubList"].Length; i++)
     {
         if (clubs["clubList"][i]["id"] == clubId)
         {
@@ -21,7 +21,7 @@ void RenderDiscordSettings()
     }
     if (UI::BeginCombo("##ClubComboBox", currentClub))
     {
-        for (int i = 0; i < clubs["clubList"].Length; i++)
+        for (int i = 0; clubs.HasKey("clubList") && i < clubs["clubList"].Length; i++)
         {
             string clubname = clubs["clubList"][i]["name"];
             int clubID = clubs["clubList"][i]["id"];
