@@ -187,7 +187,7 @@ void RenderDiscordSettings()
     UI::SameLine();
     UI::SetNextItemWidth(200);
     string newDiscordID = UI::InputText("##DiscordID" + parts.Length, "");
-    if (newTrackmaniaUsername.get_Length() > 0 || newDiscordID.get_Length() > 0) {
+    if (newTrackmaniaUsername.Length > 0 || newDiscordID.Length > 0) {
         settings_usernames += "\n" + newTrackmaniaUsername + ";" + newDiscordID;
     }
 

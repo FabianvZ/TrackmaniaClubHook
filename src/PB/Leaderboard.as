@@ -8,7 +8,7 @@ class Leaderboard {
         this.score = score;
         leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + map.Uid + "/club/" + clubId + "/top?length=100&offset=0");
         // Replace trackmania user ids with trackmania usernames
-        for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
+        for(uint i = 0; i < leaderboard["top"].Length; i++) {
             leaderboard["top"][i]["accountId"] = GetPlayerDisplayName(leaderboard["top"][i]["accountId"]);
         }
         // Insert new time into leaderboard without waiting for it to update
@@ -48,18 +48,18 @@ class Leaderboard {
 
     string toString() {
         string result = "";
-        for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
+        for(uint i = 0; i < leaderboard["top"].Length; i++) {
             string username = leaderboard["top"][i]["accountId"];
             string time = Time::Format(leaderboard["top"][i]["score"]);
             result += (i + 1) + ": " + username + " : " + time;
-            if (i != leaderboard["top"].get_Length() - 1) {
+            if (i != leaderboard["top"].Length - 1) {
                 result += "\\n";
             }
         }
         return result;
     }
 
-    private string GetDiscordUserId(string TMUsername){
+    private string GetDiscordUserId(const string &in TMUsername){
         array<string> parts = settings_usernames.Split("\n");
 
         for (uint i = 0; i < parts.Length; i++)
@@ -75,23 +75,23 @@ class Leaderboard {
 
     uint getPosition(uint pb) 
     {
-        for(uint n = 0; n < leaderboard["top"].get_Length(); n++) {
+        for(uint n = 0; n < leaderboard["top"].Length; n++) {
             uint score = leaderboard["top"][n]["score"];
             if (pb < score) {
                 return n;
             }
         }
-        return leaderboard["top"].get_Length();
+        return leaderboard["top"].Length;
     }
 
-    uint getPosition(string name) 
+    uint getPosition(const string &in name) 
     {
-        for(uint n = 0; n < leaderboard["top"].get_Length(); n++) {
+        for(uint n = 0; n < leaderboard["top"].Length; n++) {
             if (leaderboard["top"][n]["accountId"] == name) {
                 return n;
             }
         }
-        return leaderboard["top"].get_Length();
+        return leaderboard["top"].Length;
     }
 
     uint getScore() {
