@@ -50,7 +50,7 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    Leaderboard@ leaderboard;
+    uint previousScore;
 
     while (true)
     {
@@ -81,20 +81,15 @@ void PBLoop()
         {
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
-            @leaderboard = Leaderboard(user, map, GetCurrBestTime(app, map.Uid));
+            previousScore = GetCurrBestTime(app, map.Uid);
             continue;
         }
 
-        uint currentPB = GetCurrBestTime(app, map.Uid);
+        uint currentPB = force_send_pb? 0 : GetCurrBestTime(app, map.Uid);
+        force_send_pb = false;
 
-        if (force_send_pb) {
-            force_send_pb = false;
-            currentPB = 1;
-        }
-
-        if (leaderboard.getScore() > currentPB) {
-            int previousScore = leaderboard.getScore();
-            leaderboard = Leaderboard(user, map, currentPB);
+        if (previousScore > currentPB) {
+            Leaderboard@ leaderboard = Leaderboard(user, map, currentPB);
             
             if (leaderboard.getPosition(currentPB) < leaderboard.getPosition(previousScore)) {
                 Log("New leaderboard position: " + leaderboard.getPosition(previousScore) + " -> " + (leaderboard.getPosition(currentPB) - 1));
@@ -104,6 +99,7 @@ void PBLoop()
                     SendDiscordWebHook(pb);
 
             }
+            previousScore = currentPB;
         }
         sleep(1000);
     }
