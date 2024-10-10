@@ -69,6 +69,13 @@ void PBLoop()
             continue;
         }
 
+        // Map is not published
+        if (currentMap.MapInfo.MapUid.Length == 0)
+        {
+            sleep(3000);
+            continue;
+        }
+
         // Map changed
         if (currentMap.MapInfo.MapUid != lastMapUid)
         {
