@@ -25,9 +25,9 @@ class DiscordWebHook : WebRequest
         parts[i] = Regex::Replace(parts[i], "\\[MapAuthorName\\]", map.AuthorName);
         parts[i] = Regex::Replace(parts[i], "\\[MapAuthorLink\\]", URL::TrackmaniaIOPlayer + map.AuthorLogin);
         parts[i] = Regex::Replace(parts[i], "\\[ThumbnailLink\\]", map.TrackId != 0 ? URL::TrackmaniaExchangeThumbnail + map.TrackId : "");
-        parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Time::Format(data.get_timer().session) +  " / " + Time::Format(data.get_timer().total));
-        parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", data.finishes.session +  " / " + data.finishes.total);
-        parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", data.resets.session + " / " + data.resets.total);
+        parts[i] = Regex::Replace(parts[i], "\\[GrindTime\\]", Time::Format(GrindingStats::GetSessionTime()) +  " / " + Time::Format(GrindingStats::GetTotalTime()));
+        parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", GrindingStats::GetSessionFinishes() +  " / " + GrindingStats::GetTotalFinishes());
+        parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", GrindingStats::GetSessionResets() + " / " + GrindingStats::GetTotalResets());
         parts[i] = Regex::Replace(parts[i], "\\[ClubLeaderboard\\]", pb.Leaderboard.toString());
         parts[i] = Regex::Replace(parts[i], "\\[Losers\\]", pb.Leaderboard.getLosers(pb.PreviousScore));
     }
