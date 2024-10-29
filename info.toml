@@ -2,9 +2,8 @@
 name        = "Discord Rivalry Ping"
 author      = "FabianvZ, Lokulicious"
 category    = "Utilities"
-version     = "0.3"
-blocks      = ["GrindingStats"]
+version     = "0.5"
 
 [script]
-dependencies = [ "NadeoServices"]
+dependencies = [ "NadeoServices", "GrindingStats"]
 optional_dependencies = [ "ChampionMedals", "Discord" ]

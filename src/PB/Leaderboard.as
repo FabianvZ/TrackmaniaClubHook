@@ -1,16 +1,18 @@
 class Leaderboard {
 
-    Json::Value leaderboard;
-    User@ User;
-    Map@ Map;
+    private Json::Value leaderboard;
+    private uint score;
 
-    Leaderboard(User@ user, Map@ map, int score)
+    Leaderboard(User@ user, Map@ map, uint score)
     {
-        @User = user;
-        @Map = map;
-        leaderboard = GetMapLeaderboard();
+        this.score = score;
+        leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + map.Uid + "/club/" + clubId + "/top?length=100&offset=0");
+        // Replace trackmania user ids with trackmania usernames
+        for(uint i = 0; i < leaderboard["top"].Length; i++) {
+            leaderboard["top"][i]["accountId"] = GetPlayerDisplayName(leaderboard["top"][i]["accountId"]);
+        }
         // Insert new time into leaderboard without waiting for it to update
-        int currentPosition = getLeaderboardPosition();
+        uint currentPosition = getPosition(user.Name);
         if (currentPosition == leaderboard["top"].Length) 
         {
             Json::Value myRecord = Json::Object();
@@ -18,25 +20,18 @@ class Leaderboard {
             leaderboard["top"].Add(myRecord);
         }
         leaderboard["top"][currentPosition]["score"] = score;
-        for (int i = currentPosition; i > getPosition(score); i--)
+        for (uint i = currentPosition; i > getPosition(score); i--)
         {
             Json::Value temp = leaderboard["top"][i - 1];
             leaderboard["top"][i - 1] = leaderboard["top"][i];
             leaderboard["top"][i] = temp;
         }
-    }
+    }  
 
-    Leaderboard(User@ user, Map@ map) {
-        @User = user;
-        @Map = map;
-        leaderboard = GetMapLeaderboard();
-    }
-    
-
-    string getLosers(PB@ pb) {
+    string getLosers(uint oldScore) {
         string result = "";
-        uint startPos = getPosition(pb.CurrentPB);
-        uint endPos = getLeaderboardPosition();
+        uint startPos = getPosition(score);
+        uint endPos = getPosition(oldScore);
         for (uint i = startPos; i < endPos; i++) {
             result += GetDiscordUserId(leaderboard["top"][i]["accountId"]);
 
@@ -53,30 +48,18 @@ class Leaderboard {
 
     string toString() {
         string result = "";
-        for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
+        for(uint i = 0; i < leaderboard["top"].Length; i++) {
             string username = leaderboard["top"][i]["accountId"];
             string time = Time::Format(leaderboard["top"][i]["score"]);
             result += (i + 1) + ": " + username + " : " + time;
-            if (i != leaderboard["top"].get_Length() - 1) {
+            if (i != leaderboard["top"].Length - 1) {
                 result += "\\n";
             }
         }
         return result;
     }
 
-    Json::Value GetMapLeaderboard(){
-        Log("Getting map Leaderboard for club");
-        auto newleaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + Map.Uid + "/club/" + User.PinnedClub + "/top?length=100&offset=0");
-
-        for(uint i = 0; i < newleaderboard["top"].get_Length(); i++) {
-            newleaderboard["top"][i]["accountId"] = GetPlayerDisplayName(newleaderboard["top"][i]["accountId"]);
-            string username = newleaderboard["top"][i]["accountId"];
-            Log("Place: " + i + " : " + username);
-        }
-        return newleaderboard;
-    }
-
-    string GetDiscordUserId(string TMUsername){
+    private string GetDiscordUserId(const string &in TMUsername){
         array<string> parts = settings_usernames.Split("\n");
 
         for (uint i = 0; i < parts.Length; i++)
@@ -90,32 +73,29 @@ class Leaderboard {
         return TMUsername;
     }
 
-    uint getPosition(uint pb) {
-        for(uint n = 0; n < leaderboard["top"].get_Length(); n++) {
+    uint getPosition(uint pb) 
+    {
+        for(uint n = 0; n < leaderboard["top"].Length; n++) {
             uint score = leaderboard["top"][n]["score"];
             if (pb < score) {
                 return n;
             }
         }
-        return leaderboard["top"].get_Length();
+        return leaderboard["top"].Length;
     }
 
-    uint getLeaderboardPosition() {
-        for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
-            if (leaderboard["top"][i]["accountId"] == User.Name) {
-                return i;
+    uint getPosition(const string &in name) 
+    {
+        for(uint n = 0; n < leaderboard["top"].Length; n++) {
+            if (leaderboard["top"][n]["accountId"] == name) {
+                return n;
             }
         }
-        return leaderboard["top"].get_Length();
+        return leaderboard["top"].Length;
     }
 
-    uint getPB() {
-        for(uint i = 0; i < leaderboard["top"].get_Length(); i++) {
-            if (leaderboard["top"][i]["accountId"] == User.Name) {
-                return leaderboard["top"][i]["score"];
-            }
-        }
-        return uint(-1);
+    uint getScore() {
+        return score;
     }
 
 }

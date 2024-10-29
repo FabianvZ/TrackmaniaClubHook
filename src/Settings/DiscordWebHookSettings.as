@@ -8,6 +8,36 @@ void RenderDiscordSettings()
     settings_discord_user_id = UI::InputText("Discord User-ID", settings_discord_user_id);
 #endif
 
+    UI::Text("Club");
+    string currentClub ;
+    for (uint i = 0; clubs.HasKey("clubList") &&  i < clubs["clubList"].Length; i++)
+    {
+        if (clubs["clubList"][i]["id"] == clubId)
+        {
+            string clubname = clubs["clubList"][i]["name"];
+            int clubID = clubs["clubList"][i]["id"];
+            currentClub = clubname + " (ClubId: " + clubID + ")";
+        }
+    }
+    if (UI::BeginCombo("##ClubComboBox", currentClub))
+    {
+        for (uint i = 0; clubs.HasKey("clubList") && i < clubs["clubList"].Length; i++)
+        {
+            string clubname = clubs["clubList"][i]["name"];
+            int clubID = clubs["clubList"][i]["id"];
+            if (UI::Selectable(clubname + " (ClubId: " + clubID + ")", clubs["clubList"][i]["id"] == clubId))
+            {
+                clubId = clubs["clubList"][i]["id"];
+            }
+        }
+        UI::EndCombo();
+    }
+    UI::SameLine();
+    if (UI::Button("Reload clubs")) 
+    {
+        reloadclubs = true;
+    }
+
     UI::BeginTabBar("DiscordPBMessageSettings", UI::TabBarFlags::FittingPolicyResizeDown);
     if (UI::BeginTabItem(Icons::Trophy + " PB"))
     {
@@ -124,6 +154,8 @@ void RenderDiscordSettings()
 		UI::EndTabItem();
     }
 
+    UI::Separator();
+
     UI::SetNextItemWidth(300);
     UI::Text("Trackmania username");
     UI::SameLine();
@@ -155,7 +187,7 @@ void RenderDiscordSettings()
     UI::SameLine();
     UI::SetNextItemWidth(200);
     string newDiscordID = UI::InputText("##DiscordID" + parts.Length, "");
-    if (newTrackmaniaUsername.get_Length() > 0 || newDiscordID.get_Length() > 0) {
+    if (newTrackmaniaUsername.Length > 0 || newDiscordID.Length > 0) {
         settings_usernames += "\n" + newTrackmaniaUsername + ";" + newDiscordID;
     }
 
@@ -244,6 +276,7 @@ void RenderResetButton()
         settings_champion_medal_string = DiscordDefaults::ChampionMedal;
         settings_Body = DiscordDefaults::Body;
         settings_usernames = DiscordDefaults::usernames;
+        reloadclubs = true;
     }
 }
 

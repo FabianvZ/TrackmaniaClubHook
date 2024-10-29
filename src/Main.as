@@ -6,10 +6,7 @@ void Main()
 #if DEPENDENCY_NADEOSERVICES
 	NadeoServices::AddAudience("NadeoLiveServices");
 #endif
-	if (setting_recap_show_menu && !recap.started)
-		recap.start();
 
-	migrateOldData();
 #if DEPENDENCY_DISCORD
     if (settings_discord_user_id == "")
     {
@@ -29,6 +26,18 @@ void Main()
         }
     }
 #endif
+    if (clubId == -1)
+    {
+        clubId = Nadeo::LiveServiceRequest("/api/token/club/player/info")["pinnedClub"];
+    }    
+    if (settings_discord_URL == DiscordDefaults::URL)
+    {
+        UI::ShowNotification(
+				"Discord Rivalry Ping",
+				"Discord webhook is not set in settings. This is needed to send leaderboards!",
+				UI::HSV(0.10f, 1.0f, 1.0f), 7500);
+    }
+    migrateOldData();
     startnew(PBLoop);
 }
 
@@ -39,17 +48,30 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    uint previousPB;
-    Leaderboard@ leaderboard;
+    uint previousScore;
 
     while (true)
     {
+
+        if (reloadclubs)
+        {
+            clubs = Nadeo::LiveServiceRequest("/api/token/club/mine?length=100&offset=0");
+            reloadclubs = false;
+        }
+
         // Wait until player is on a map
-        while (!IsValidMap(currentMap))
+        if (currentMap is null || currentMap.MapInfo is null)
         {
             sleep(3000);
-            @app = cast<CTrackMania@>(GetApp());
             @currentMap = app.RootMap;
+            continue;
+        }
+
+        // Map is not published
+        if (currentMap.MapInfo.MapUid.Length == 0)
+        {
+            sleep(3000);
+            continue;
         }
 
         // Map changed
@@ -57,39 +79,28 @@ void PBLoop()
         {
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
-            @leaderboard = Leaderboard(user, map);
-            previousPB = GetCurrBestTime(app, map.Uid);
+            previousScore = GetCurrBestTime(app, map.Uid);
             continue;
         }
 
-        uint currentPB = GetCurrBestTime(app, map.Uid);
+        uint currentPB = force_send_pb? 0 : GetCurrBestTime(app, map.Uid);
+        force_send_pb = false;
 
-        if (force_send_pb) {
-            currentPB = 1;
-        }
-
-        // New club leaderboard place
-        if (currentPB < previousPB) {
-            Log("New PB: " + previousPB + " -> " + currentPB);
-            if (leaderboard.getPosition(currentPB) < leaderboard.getLeaderboardPosition()) {
-                Log("New leaderboard position: " + leaderboard.getLeaderboardPosition() + " -> " + leaderboard.getPosition(currentPB));
-                PB @pb = PB(user, map, currentPB, leaderboard);
+        if (previousScore > currentPB) {
+            Leaderboard@ leaderboard = Leaderboard(user, map, currentPB);
+            
+            if (leaderboard.getPosition(currentPB) < leaderboard.getPosition(previousScore)) {
+                Log("New leaderboard position: " + leaderboard.getPosition(previousScore) + " -> " + (leaderboard.getPosition(currentPB) - 1));
+                PB @pb = PB(user, map, previousScore, leaderboard);
 
                 if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
                     SendDiscordWebHook(pb);
 
-                @leaderboard = Leaderboard(user, map);
-                previousPB = currentPB;
-                force_send_pb = false;
             }
+            previousScore = currentPB;
         }
         sleep(1000);
     }
-}
-
-bool IsValidMap(CGameCtnChallenge@ map)
-{
-    return !(map is null || map.MapInfo is null);
 }
 
 uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
@@ -117,35 +128,86 @@ void SendDiscordWebHook(PB@ pb)
 }
 
 string GetPlayerDisplayName(const string &in accountId)
+{
+    auto ums = GetApp().UserManagerScript;
+    MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
+    playerIds.Add(accountId);
+
+    auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
+    while (req.IsProcessing)
     {
-        auto ums = GetApp().UserManagerScript;
-        MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
-        playerIds.Add(accountId);
-
-        auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
-        while (req.IsProcessing)
-        {
-            yield();
-        }
-
-        string[] playerNames = array<string>(playerIds.Length);
-        for (uint i = 0; i < playerIds.Length; i++)
-        {
-            playerNames[i] = string(req.GetDisplayName(wstring(playerIds[i])));
-        }
-        return playerNames[0];
+        yield();
     }
 
-    MwId GetMainUserId() {
-		auto app = cast<CTrackMania>(GetApp());
-		if (app.ManiaPlanetScriptAPI.UserMgr.MainUser !is null) {
-			return app.ManiaPlanetScriptAPI.UserMgr.MainUser.Id;
-		}
-		if (app.ManiaPlanetScriptAPI.UserMgr.Users.Length >= 1) {
-			return app.ManiaPlanetScriptAPI.UserMgr.Users[0].Id;
+    string[] playerNames = array<string>(playerIds.Length);
+    for (uint i = 0; i < playerIds.Length; i++)
+    {
+        playerNames[i] = string(req.GetDisplayName(wstring(playerIds[i])));
+    }
+    return playerNames[0];
+}
+
+MwId GetMainUserId() {
+    auto app = cast<CTrackMania>(GetApp());
+    if (app.ManiaPlanetScriptAPI.UserMgr.MainUser !is null) {
+        return app.ManiaPlanetScriptAPI.UserMgr.MainUser.Id;
+    }
+    if (app.ManiaPlanetScriptAPI.UserMgr.Users.Length >= 1) {
+        return app.ManiaPlanetScriptAPI.UserMgr.Users[0].Id;
+    } else {
+        return MwId();
+    }
+}
+
+//{"medals":"[{\"medal\":0,\"achieved\":true,\"achieved_time\":\"          0\"},{\"medal\":1,\"achieved\":true,\"achieved_time\":\"          0\"},{\"medal\":2,\"achieved\":true,\"achieved_time\":\"          0\"},{\"medal\":3,\"achieved\":false,\"achieved_time\":\"          0\"},{\"medal\":5,\"achieved\":false,\"achieved_time\":\"          0\"}]","time":"     138230","finishes":"     2","resets":"     5","respawns":"     0"}
+void migrateOldData() {
+	auto old_path = IO::FromStorageFolder("data");
+	if (IO::FolderExists(old_path)) {
+		UI::ShowNotification("Discord Rivalry Ping", "Moving Grinding Stats data to Grinding stats plugin.", UI::HSV(0.10f, 1.0f, 1.0f), 2500);
+		auto new_path = IO::FromDataFolder("PluginStorage/GrindingStats/data");
+		if (IO::FolderExists(new_path)) {
+
+            auto old = IO::IndexFolder(old_path, true);
+            for (uint i = 0; i < old.Length; i++) {
+                const string[] @parts = old[i].Split("/");
+                const string name = new_path + "/" + parts[parts.Length - 1];
+                if (IO::FileExists(name)) {
+                    print("Combining " + old[i] + " and " + name);
+                    Json::Value new_file = Json::FromFile(name);
+                    Json::Value old_file = Json::FromFile(old[i]);
+
+                    new_file["finishes"] = Text::Format("%6d", getValue(new_file["finishes"]) + getValue(old_file["finishes"]));
+                    new_file["resets"] = Text::Format("%6d", getValue(new_file["resets"]) + getValue(old_file["resets"]));
+                    new_file["time"] = Text::Format("%11d", getValue(new_file["time"]) + getValue(old_file["time"]));
+                    new_file["respawns"] = Text::Format("%6d", getValue(new_file["respawns"]) + getValue(old_file["respawns"]));
+
+                    Json::ToFile(name, new_file);
+                    IO::Delete(old[i]);
+                } 
+                else {
+                    print("moving " + old[i] + " to " + name);
+                    IO::Move(old[i], name);
+                }
+            }
+            UI::ShowNotification("Discord Rivalry Ping", "Completed Data Transfer", UI::HSV(0.35f, 1.0f, 1.0f), 10000);
+            IO::DeleteFolder(old_path);
 		} else {
-			return MwId();
-		}
+            IO::Move(old_path, new_path);
+            if (IO::IndexFolder(old_path, true).Length == 0) {
+                IO::DeleteFolder(old_path);
+            }
+        }
 	}
+}
 
-
+int getValue(Json::Value value) 
+{
+    switch (value.GetType())
+    {
+        case Json::Type::String:
+            return Text::ParseUInt64(value);
+        case Json::Type::Number:
+            return value;
+    }
+    return 0;
+}

@@ -69,6 +69,11 @@ string settings_usernames = DiscordDefaults::usernames;
 [Setting hidden]
 bool settings_debug_log = true;
 
+[Setting hidden]
+int clubId = -1;
+Json::Value clubs = Json::Object();
+bool reloadclubs = true;
+
 #if SIG_DEVELOPER
 [Setting name="Send PB" category="Testing"]
 #endif

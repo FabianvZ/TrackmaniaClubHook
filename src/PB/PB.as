@@ -1,60 +1,56 @@
 class PB
 {
-    User@ User;
     Map@ Map;
-    uint CurrentPB;
-    uint PreviousPB;
-    int Position;
+    User@ User;
     Medal Medal;
-    Leaderboard@ PreviousLeaderboard;
-    Leaderboard@ CurrentLeaderboard;
+    Leaderboard@ Leaderboard;
+    uint PreviousScore;
+    int Position;
 
-    PB(User@ user, Map@ map, uint currentPB, Leaderboard@ previousLeaderboard)
+    PB(User@ user, Map@ map, uint previousScore, Leaderboard@ leaderboard)
     {
         @User = user;
         @Map = map;
-        CurrentPB = currentPB;
-        Position = GetPBPosition(Map.Uid, CurrentPB);
-        Medal = GetReachedMedal(CurrentPB, Map);
-        @PreviousLeaderboard = previousLeaderboard;
-        PreviousPB = previousLeaderboard.getPB();
-        @CurrentLeaderboard = Leaderboard(User, Map, currentPB);
+        Position = GetPBPosition(Map.Uid, leaderboard.getScore());
+        Medal = GetReachedMedal(Map, leaderboard.getScore());
+        PreviousScore = previousScore;
+        @Leaderboard = leaderboard;
     }
 
     int GetPBPosition(const string &in mapUid, uint time)
     {
+        int position = -1;
         for (int tries = 0; tries < 10; tries++)
         {
             try
             {
-                auto info = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + mapUid + "/surround/0/0?onlyWorld=true");
+                Json::Value info = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + mapUid + "/surround/0/0?onlyWorld=true");
 
                 if (info.HasKey("tops"))
                 {
-                    auto tops = info["tops"];
+                    Json::Value tops = info["tops"];
                     if (tops.GetType() == Json::Type::Array)
                     {
-                        auto top = tops[0]["top"];
-                        auto score = top[0]["score"];
-                        auto position = top[0]["position"];
-                        // If wrong time/leaderboard entry was fetched => try again
-                        if(int(time) != score)
+                        Json::Value top = tops[0]["top"];
+                        Json::Value score = top[0]["score"];
+                        position = top[0]["position"];
+                        if(int(time) == score)
                         {
-                            sleep(100 * tries);
-                            continue;
+                            break;
                         }
-
-                        return position;
+                            
+                        // If wrong time/leaderboard entry was fetched => try again
+                        sleep(100 * tries);
                     }
                 }
             }
             catch {}
         }
 
-        return -1;
+        return position;
     }
 
-    private Medal GetReachedMedal(uint currentPB, Map@ map)
+    private Medal GetReachedMedal(Map@ map, uint currentPB)
     {
 #if DEPENDENCY_CHAMPIONMEDALS
         if (currentPB <= map.ChampionMedalTime) return Medal::Champion;
