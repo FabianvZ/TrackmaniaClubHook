@@ -8,154 +8,6 @@ void RenderDiscordSettings()
     settings_discord_user_id = UI::InputText("Discord User-ID", settings_discord_user_id);
 #endif
 
-    UI::Text("Club");
-    string currentClub ;
-    for (uint i = 0; clubs.HasKey("clubList") &&  i < clubs["clubList"].Length; i++)
-    {
-        if (clubs["clubList"][i]["id"] == clubId)
-        {
-            string clubname = clubs["clubList"][i]["name"];
-            int clubID = clubs["clubList"][i]["id"];
-            currentClub = clubname + " (ClubId: " + clubID + ")";
-        }
-    }
-    if (UI::BeginCombo("##ClubComboBox", currentClub))
-    {
-        for (uint i = 0; clubs.HasKey("clubList") && i < clubs["clubList"].Length; i++)
-        {
-            string clubname = clubs["clubList"][i]["name"];
-            int clubID = clubs["clubList"][i]["id"];
-            if (UI::Selectable(clubname + " (ClubId: " + clubID + ")", clubs["clubList"][i]["id"] == clubId))
-            {
-                clubId = clubs["clubList"][i]["id"];
-            }
-        }
-        UI::EndCombo();
-    }
-    UI::SameLine();
-    if (UI::Button("Reload clubs")) 
-    {
-        reloadclubs = true;
-    }
-
-    UI::BeginTabBar("DiscordPBMessageSettings", UI::TabBarFlags::FittingPolicyResizeDown);
-    if (UI::BeginTabItem(Icons::Trophy + " PB"))
-    {
-        settings_SendPB = UI::Checkbox("Send PB", settings_SendPB);
-        UI::Separator();
-        UI::Text("Filters");
-        FilterSolver@ solver = FilterSolver::FromSettings();
-        bool updateSolver = false;
-        for (uint i = 0; i < solver.Filters.Length; i++)
-        {
-            auto filter = solver.Filters[i];
-            
-            UI::SetNextItemWidth(160);
-            if (UI::BeginCombo("##ComboArgument" + i, FilterArgument::ToString(filter.FilterArgument)))
-            {
-                if (UI::Selectable(FilterArgument::ToString(FilterArgument::Time), filter.FilterArgument == FilterArgument::Time))
-                {
-                    filter.FilterArgument = FilterArgument::Time;
-                    updateSolver = true;
-                }
-                if (UI::Selectable(FilterArgument::ToString(FilterArgument::Rank), filter.FilterArgument == FilterArgument::Rank))
-                {
-                    filter.FilterArgument = FilterArgument::Rank;
-                    updateSolver = true;
-                }
-                if (UI::Selectable(FilterArgument::ToString(FilterArgument::Medal), filter.FilterArgument == FilterArgument::Medal))
-                {
-                    filter.FilterArgument = FilterArgument::Medal;
-                    updateSolver = true;
-                }
-                UI::EndCombo();
-            }
-
-            UI::SameLine();
-            if (UI::Button(Comparison::ToString(filter.Comparison) + "##" + i, vec2(30, 25)))
-            {
-                filter.Comparison = Comparison::Next(filter.Comparison);
-                updateSolver = true;
-            }
-
-            UI::SameLine();
-            if (filter.FilterArgument == FilterArgument::Time || filter.FilterArgument == FilterArgument::Rank)
-            {
-                UI::SetNextItemWidth(160);
-                int newValue = UI::InputInt("##inputValue" + i, filter.FilterValue.Value);
-                if (filter.FilterValue.Value != newValue)
-                {
-                    filter.FilterValue.Value = newValue;
-                    updateSolver = true;
-                }
-            }
-            else if (filter.FilterArgument == FilterArgument::Medal)
-            {
-                UI::SetNextItemWidth(160);
-                if (UI::BeginCombo("##ComboValue" + i, Medal::ToString(Medal::FromValue(filter.FilterValue.Value))))
-                {
-                    if (UI::Selectable(Medal::ToString(Medal::No), filter.FilterValue.Value == Medal::ToValue(Medal::No)))
-                    {
-                        filter.FilterValue = FilterValue(Medal::No);
-                        updateSolver = true;
-                    }
-                    if (UI::Selectable(Medal::ToString(Medal::Bronze), filter.FilterValue.Value == Medal::ToValue(Medal::Bronze)))
-                    {
-                        filter.FilterValue = FilterValue(Medal::Bronze);
-                        updateSolver = true;
-                    }
-                    if (UI::Selectable(Medal::ToString(Medal::Silver), filter.FilterValue.Value == Medal::ToValue(Medal::Silver)))
-                    {
-                        filter.FilterValue = FilterValue(Medal::Silver);
-                        updateSolver = true;
-                    }
-                    if (UI::Selectable(Medal::ToString(Medal::Gold), filter.FilterValue.Value == Medal::ToValue(Medal::Gold)))
-                    {
-                        filter.FilterValue = FilterValue(Medal::Gold);
-                        updateSolver = true;
-                    }
-                    if (UI::Selectable(Medal::ToString(Medal::Author), filter.FilterValue.Value == Medal::ToValue(Medal::Author)))
-                    {
-                        filter.FilterValue = FilterValue(Medal::Author);
-                        updateSolver = true;
-                    }
-#if DEPENDENCY_CHAMPIONMEDALS
-                    if (UI::Selectable(Medal::ToString(Medal::Champion), filter.FilterValue.Value == Medal::ToValue(Medal::Champion)))
-                    {
-                        filter.FilterValue = FilterValue(Medal::Champion);
-                        updateSolver = true;
-                    }
-#endif
-                    UI::EndCombo();
-                }
-            }
-
-            UI::SameLine();
-            if (UI::ButtonColored(Icons::Trash + "##" + i, 0.0f))
-            {
-                solver.Filters.RemoveAt(i);
-                updateSolver = true;
-            }
-
-            if (i != solver.Filters.Length - 1 && UI::Button(LogicalConnection::ToString(filter.LogicalConnection) + "##" + i))
-            {
-                filter.LogicalConnection = LogicalConnection::Next(filter.LogicalConnection);
-                updateSolver = true;
-            }
-        }
-        if (updateSolver)
-            settings_filter_string = solver.Serialize();
-
-        if (UI::Button(Icons::Plus + " Add a filter"))
-        {
-            settings_filter_string += Filter::CreateNew().Serialize();
-        }
-
-		UI::EndTabItem();
-    }
-
-    UI::Separator();
-
     UI::SetNextItemWidth(300);
     UI::Text("Trackmania username");
     UI::SameLine();
@@ -172,9 +24,9 @@ void RenderDiscordSettings()
         UI::SameLine();
 
         UI::SetNextItemWidth(200);
-	parts[i] += UI::InputText("##DiscordID" + i, nameParts.Length > 1 ? nameParts[1] : "");
-        
-	UI::SameLine();
+        parts[i] += UI::InputText("##DiscordID" + i, nameParts.Length > 1 ? nameParts[1] : "");
+            
+        UI::SameLine();
         if (UI::ButtonColored(Icons::Trash + "##" + i, 0.0f)) {
             parts.RemoveAt(i);
             i--;
@@ -222,8 +74,6 @@ void RenderDiscordSettings()
 
         UI::End();
     }
-
-    UI::EndTabBar();
 
 #if SIG_DEVELOPER
     settings_AdvancedDiscordSettings = UI::Checkbox("Advanced Settings", settings_AdvancedDiscordSettings);

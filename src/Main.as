@@ -93,7 +93,7 @@ void PBLoop()
                 Log("New leaderboard position: " + leaderboard.getPosition(previousScore) + " -> " + (leaderboard.getPosition(currentPB) - 1));
                 PB @pb = PB(user, map, previousScore, leaderboard);
 
-                if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
+                if (settings_SendPB && true)
                     SendDiscordWebHook(pb);
 
             }

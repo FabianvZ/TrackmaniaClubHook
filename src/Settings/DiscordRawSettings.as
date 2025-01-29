@@ -84,3 +84,6 @@ bool showImportPopup = false;
 string import_settings_usernames = "";
 
 string import_error_message = "";
+
+[Setting hidden]
+string settings_webhooks = "[{}]";	
