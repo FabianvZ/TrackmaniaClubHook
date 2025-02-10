@@ -2,7 +2,7 @@
 name        = "Discord Rivalry Ping"
 author      = "FabianvZ, Lokulicious"
 category    = "Utilities"
-version     = "0.5"
+version     = "0.6"
 
 [script]
 dependencies = [ "NadeoServices", "GrindingStats"]
