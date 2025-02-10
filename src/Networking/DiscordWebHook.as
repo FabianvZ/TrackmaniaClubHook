@@ -9,6 +9,7 @@ class DiscordWebHook : WebRequest
     string GetInterpolatedBody(PB@ pb)
 {
     Map@ map = pb.Map;
+    bool IsWeeklyShorts = WeeklyShorts::IsWeeklyShorts(map);
 
     array<string> parts = settings_Body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)
@@ -16,7 +17,7 @@ class DiscordWebHook : WebRequest
         parts[i] = Regex::Replace(parts[i], "\\[UserName\\]", pb.User.Name);
         parts[i] = Regex::Replace(parts[i], "\\[UserLink\\]", URL::TrackmaniaIOPlayer + pb.User.Id);
         parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", settings_discord_user_id);
-        parts[i] = Regex::Replace(parts[i], "\\[Time\\]", Time::Format(pb.Leaderboard.getScore()));
+        parts[i] = Regex::Replace(parts[i], "\\[Time\\]", IsWeeklyShorts? "Secret" : Time::Format(pb.Leaderboard.getScore()));
         parts[i] = Regex::Replace(parts[i], "\\[TimeDelta\\]", pb.PreviousScore != uint(-1) ? " (-" + Time::Format(pb.PreviousScore - pb.Leaderboard.getScore()) + ")" : "");
         parts[i] = Regex::Replace(parts[i], "\\[Rank\\]", "" + pb.Position);
         parts[i] = Regex::Replace(parts[i], "\\[Medal\\]", Medal::ToDiscordString(pb.Medal));

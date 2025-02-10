@@ -2,10 +2,12 @@ class Leaderboard {
 
     private Json::Value leaderboard;
     private uint score;
+    private Map@ map;
 
     Leaderboard(User@ user, Map@ map, uint score)
     {
         this.score = score;
+        @this.map = map;
         leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + map.Uid + "/club/" + clubId + "/top?length=100&offset=0");
         // Replace trackmania user ids with trackmania usernames
         for(uint i = 0; i < leaderboard["top"].Length; i++) {
@@ -48,9 +50,10 @@ class Leaderboard {
 
     string toString() {
         string result = "";
+        bool IsWeeklyShorts = WeeklyShorts::IsWeeklyShorts(map);
         for(uint i = 0; i < leaderboard["top"].Length; i++) {
             string username = leaderboard["top"][i]["accountId"];
-            string time = Time::Format(leaderboard["top"][i]["score"]);
+            string time = IsWeeklyShorts? "Secret" :Time::Format(leaderboard["top"][i]["score"]);
             result += (i + 1) + ": " + username + " : " + time;
             if (i != leaderboard["top"].Length - 1) {
                 result += "\\n";
@@ -77,7 +80,7 @@ class Leaderboard {
     {
         for(uint n = 0; n < leaderboard["top"].Length; n++) {
             uint score = leaderboard["top"][n]["score"];
-            if (pb < score) {
+            if (score != uint(-1) && pb < score) {
                 return n;
             }
         }
