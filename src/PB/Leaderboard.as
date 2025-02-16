@@ -50,7 +50,7 @@ class Leaderboard {
 
     string toString() {
         string result = "";
-        bool IsWeeklyShorts = WeeklyShorts::IsWeeklyShorts(map);
+        bool IsWeeklyShorts = Campaign::WeeklyShorts.IsCurrentCampaignMap(map);
         for(uint i = 0; i < leaderboard["top"].Length; i++) {
             string username = leaderboard["top"][i]["accountId"];
             string time = IsWeeklyShorts? "Secret" :Time::Format(leaderboard["top"][i]["score"]);

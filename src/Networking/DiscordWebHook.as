@@ -9,7 +9,7 @@ class DiscordWebHook : WebRequest
     string GetInterpolatedBody(PB@ pb)
 {
     Map@ map = pb.Map;
-    bool IsWeeklyShorts = WeeklyShorts::IsWeeklyShorts(map);
+    bool IsWeeklyShorts = Campaign::Official.IsCurrentCampaignMap(map);
 
     array<string> parts = settings_Body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)

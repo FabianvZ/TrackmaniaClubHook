@@ -54,4 +54,8 @@ class WebhookFilter : JsonSetting {
         return false;
     }
 
+    bool Solve(PB@ pb) {
+        return true;
+    }
+
 }

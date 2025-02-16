@@ -8,11 +8,11 @@ class Comparison : WebhookFilter {
 
     Json::Value@ SecondFilter {
         get {
-            if (Data.HasKey("SecondFilter"))
+            if (!Data.HasKey("SecondFilter"))
             {
-                return Data["SecondFilter"];
+                Data["SecondFilter"] = Json::Object();
             }
-            return Json::Object();
+            return Data["SecondFilter"];
         }
     }
 
