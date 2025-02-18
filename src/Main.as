@@ -83,17 +83,19 @@ void PBLoop()
             continue;
         }
 
-        uint currentPB = force_send_pb? 0 : GetCurrBestTime(app, map.Uid);
+        uint currentPB = force_send_pb? 1 : GetCurrBestTime(app, map.Uid);
         force_send_pb = false;
 
         if (previousScore > currentPB) {
+            Log("New PB: " + currentPB);
             Leaderboard@ leaderboard = Leaderboard(user, map, currentPB);
             
-            if (leaderboard.getPosition(currentPB) < leaderboard.getPosition(previousScore)) {
-                Log("New leaderboard position: " + leaderboard.getPosition(previousScore) + " -> " + (leaderboard.getPosition(currentPB) - 1));
+            if (leaderboard.HasBeatenClubMember) {
+                Log("Beaten Club Member");
                 PB @pb = PB(user, map, previousScore, leaderboard);
 
                 if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
+                    Log("Sending PB to Discord");
                     SendDiscordWebHook(pb);
 
             }
