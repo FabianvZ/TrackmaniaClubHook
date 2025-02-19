@@ -5,7 +5,7 @@ class Leaderboard {
         get {
             string result = "";
             for (uint i = 0; i < losers.Length; i++) {
-                result += losers[i];
+                result += GetDiscordUserId(losers[i]);
 
                 if (i != losers.Length && losers.Length - 1 != 0) {
                     if (i == losers.Length - 2) {
@@ -28,12 +28,13 @@ class Leaderboard {
     private Json::Value leaderboard;
     private uint score;
     private Map@ map;
-    
+    private User@ user;
 
     Leaderboard(User@ user, Map@ map, uint score)
     {
         this.score = score;
         @this.map = map;
+        @this.user = user;
         leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + map.Uid + "/club/" + clubId + "/top?length=100&offset=0")["top"];
 
         Json::Value@ requestbody = Json::Object();
@@ -49,43 +50,54 @@ class Leaderboard {
         
         // Insert global leaderboards into leaderboard
         Json::Value@ positions = Nadeo::LiveServicePostRequest("/api/token/leaderboard/trophy/player", requestbody)["rankings"];
-        Log(Json::Write(positions));
-        for (int i = 0; i < positions.Length; i++) {
+        for (uint i = 0; i < positions.Length; i++) {
             string accountId = positions[i]["accountId"];
-            Log("Account ID: " + accountId);
-            if (accountId == user.Id) {
-                @requestbody = Json::Object();
-                requestbody["maps"] = Json::Array();
-                Json::Value map = Json::Object();
-                map["mapUid"] = this.map.Uid;
-                map["groupUid"] = "Personal_Best";
-                requestbody["maps"].Add(map);
-                Json::Value@ position =  Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map?scores[{" + this.map.Uid +  "}]={" + score + "}", requestbody);
-                leaderboard[i]["GlobalPosition"] = position[0]["zones"][0]["ranking"]["position"];
+            {
+                uint position = positions[i]["zones"][0]["ranking"]["position"];
+                for (uint j = 0; j < leaderboard.Length; j++) {
+                    if (leaderboard[j]["accountId"] == accountId) {
+                        leaderboard[j]["GlobalPosition"] = position;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Insert Global position for personal best into leaderboard
+        @requestbody = Json::Object();
+        requestbody["maps"] = Json::Array();
+        Json::Value mapJson = Json::Object();
+        mapJson["mapUid"] = map.Uid;
+        mapJson["groupUid"] = "Personal_Best";
+        requestbody["maps"].Add(mapJson);
+        for (uint i = 0; i <= leaderboard.Length; i++) {
+            if (i == leaderboard.Length) {
+                Json::Value myRecord = Json::Object();
+                myRecord["accountId"] = user.Id;
+                myRecord["username"] = user.Name;
+                myRecord["score"] = score;
+                leaderboard.Add(myRecord);
+            }
+
+            if (leaderboard[i]["accountId"] == user.Id) {
+                leaderboard[i]["GlobalPosition"] = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map?scores[" + map.Uid +  "]=" + score, requestbody)[0]["zones"][0]["ranking"]["position"];
+                if (WeeklyShorts::IsWeeklyShorts(map)) {
+                    leaderboard[i]["score"] = -1;
+                }
+
                 for (int j = i; j > 0; j--) {
-                    Log("J: " + Json::Write(leaderboard[j]));
-                    Log("J - 1: " + Json::Write(leaderboard[j - 1]));
                     if (uint(leaderboard[j]["GlobalPosition"]) < uint(leaderboard[j - 1]["GlobalPosition"])) {
+                        Log("Beating: " + string(leaderboard[j - 1]["username"]));
                         losers.InsertLast(leaderboard[j - 1]["username"]);
 
                         Json::Value temp = leaderboard[j];
                         leaderboard[j] = leaderboard[j - 1];
                         leaderboard[j - 1] = temp;
                     }
-                }
+                }                 
                 break;
             }
-            else
-            {
-                uint position = positions[i]["zones"][0]["ranking"]["position"];
-                for (int j = 0; j < leaderboard.Length; j++) {
-                    if (leaderboard[j]["accountId"] == accountId) {
-                        Log("Setting position: " + position);
-                        leaderboard[j]["GlobalPosition"] = position;
-                        break;
-                    }
-                }
-            }
+        
         }
     }  
 
@@ -93,7 +105,7 @@ class Leaderboard {
         string result = "";
         for(uint i = 0; i < leaderboard.Length; i++) {
             string username = leaderboard[i]["username"];
-            string time = Time::Format(leaderboard[i]["score"]);
+            string time = leaderboard[i]["score"] == -1? "Secret" : Time::Format(leaderboard[i]["score"]);
             result += (i + 1) + ": " + username + " : " + time;
             if (i != leaderboard.Length - 1) {
                 result += "\\n";
@@ -114,27 +126,6 @@ class Leaderboard {
         }
 
         return TMUsername;
-    }
-
-    private uint getPosition(uint pb) 
-    {
-        for(uint n = 0; n < leaderboard.Length; n++) {
-            uint score = leaderboard[n]["score"];
-            if (score != uint(-1) && pb < score) {
-                return n;
-            }
-        }
-        return leaderboard.Length;
-    }
-
-    private uint getPosition(const string &in name) 
-    {
-        for(uint n = 0; n < leaderboard.Length; n++) {
-            if (leaderboard[n]["username"] == name) {
-                return n;
-            }
-        }
-        return leaderboard.Length;
     }
 
     uint getScore() {
