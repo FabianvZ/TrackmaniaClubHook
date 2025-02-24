@@ -79,6 +79,11 @@ bool reloadclubs = true;
 #endif
 bool force_send_pb = false;
 
+#if SIG_DEVELOPER
+[Setting name="Send PB Score" category="Testing"]
+#endif
+int force_send_pb_time = 1;
+
 bool showImportPopup = false;
 
 string import_settings_usernames = "";

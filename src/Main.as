@@ -83,7 +83,7 @@ void PBLoop()
             continue;
         }
 
-        uint currentPB = force_send_pb? 1 : GetCurrBestTime(app, map.Uid);
+        uint currentPB = force_send_pb? force_send_pb_time : GetCurrBestTime(app, map.Uid);
         force_send_pb = false;
 
         if (previousScore > currentPB) {
