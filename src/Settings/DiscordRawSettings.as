@@ -89,3 +89,7 @@ bool showImportPopup = false;
 string import_settings_usernames = "";
 
 string import_error_message = "";
+
+[Setting hidden]
+VirtualKey shortcutKey;
+bool recordShortcut = false;

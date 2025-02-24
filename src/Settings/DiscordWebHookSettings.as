@@ -42,6 +42,19 @@ void RenderDiscordSettings()
     if (UI::BeginTabItem(Icons::Trophy + " PB"))
     {
         settings_SendPB = UI::Checkbox("Send PB", settings_SendPB);
+        
+        UI::Text("Shortcut to toggle Send PB: " + ((shortcutKey != 0)? tostring(shortcutKey) : "None"));
+        UI::SameLine();
+        if (UI::Button("Change shortcut"))
+        {
+            recordShortcut = true;
+        }
+        UI::SameLine();
+        if (UI::Button("Clear shortcut"))
+        {
+            shortcutKey = VirtualKey(0);
+        }
+
         UI::Separator();
         UI::Text("Filters");
         FilterSolver@ solver = FilterSolver::FromSettings();

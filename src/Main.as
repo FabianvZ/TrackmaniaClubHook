@@ -35,10 +35,35 @@ void Main()
         UI::ShowNotification(
 				"Discord Rivalry Ping",
 				"Discord webhook is not set in settings. This is needed to send leaderboards!",
-				UI::HSV(0.10f, 1.0f, 1.0f), 7500);
+				UI::HSV(0.55f, 1.0f, 1.0f), 7500);
     }
     migrateOldData();
     startnew(PBLoop);
+}
+
+bool shortcutPressed;
+
+void OnKeyPress(bool down, VirtualKey key)
+{      
+    if (recordShortcut) {
+        shortcutKey = key;
+        recordShortcut = false;
+        shortcutPressed = true;
+    }
+
+    if (key == shortcutKey) {
+        if (down && !shortcutPressed) {
+            shortcutPressed = true;
+            settings_SendPB = !settings_SendPB;
+            UI::ShowNotification(
+                "Discord Rivalry Ping",
+                "Toggled sending PBs to Discord: " + (settings_SendPB ? "Enabled" : "Disabled"),
+                UI::HSV(0.55f, 1.0f, 1.0f), 7500);
+        } 
+        else if (!down) {
+            shortcutPressed = false;
+        }
+    }
 }
 
 void PBLoop()
@@ -91,7 +116,6 @@ void PBLoop()
             Leaderboard@ leaderboard = Leaderboard(user, map, currentPB);
             
             if (leaderboard.HasBeatenClubMember) {
-                Log("Beaten Club Member");
                 PB @pb = PB(user, map, previousScore, leaderboard);
 
                 if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
