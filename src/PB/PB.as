@@ -19,35 +19,15 @@ class PB
 
     int GetPBPosition(const string &in mapUid, uint time)
     {
-        int position = -1;
-        for (int tries = 0; tries < 10; tries++)
-        {
-            try
-            {
-                Json::Value info = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + mapUid + "/surround/0/0?onlyWorld=true");
-
-                if (info.HasKey("tops"))
-                {
-                    Json::Value tops = info["tops"];
-                    if (tops.GetType() == Json::Type::Array)
-                    {
-                        Json::Value top = tops[0]["top"];
-                        Json::Value score = top[0]["score"];
-                        position = top[0]["position"];
-                        if(int(time) == score)
-                        {
-                            break;
-                        }
-                            
-                        // If wrong time/leaderboard entry was fetched => try again
-                        sleep(100 * tries);
-                    }
-                }
-            }
-            catch {}
-        }
-
-        return position;
+        Json::Value@ requestbody = Json::Object();
+        requestbody["maps"] = Json::Array();
+        Json::Value mapJson = Json::Object();
+        mapJson["mapUid"] = mapUid;
+        mapJson["groupUid"] = "Personal_Best";
+        requestbody["maps"].Add(mapJson);
+        Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map?scores[" + mapUid +  "]=" + time, requestbody);
+        Log(Json::Write(personalBest));
+        return personalBest[0]['zones'][0]["ranking"]["position"];
     }
 
     private Medal GetReachedMedal(Map@ map, uint currentPB)
