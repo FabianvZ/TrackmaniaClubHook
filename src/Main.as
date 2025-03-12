@@ -113,15 +113,16 @@ void PBLoop()
         force_send_pb = false;
 
         if (previousScore > currentPB) {
-            Log("New PB: " + currentPB);
+            Log("New PB: " + previousScore + " -> " + currentPB);
 
             uint position = GetClubLeaderboardPosition(map.Uid, currentPB);
+            Log("Club Position: " + previousPosition + " -> " + position);
             if (position < previousPosition) {
 
                 PB @pb = PB(user, map, previousScore, currentPB, previousPosition, position);
 
                 if (FilterSolver::FromSettings().Solve(pb))
-                    Log("Sending PB to Discord");
+                    Log("Passed filters");
                     SendDiscordWebHook(pb);
 
                 previousPosition = position;
@@ -154,7 +155,6 @@ uint GetClubLeaderboardPosition(const string &in mapUid, uint score)
 
 void SendDiscordWebHook(PB@ pb)
 {
-    Log("Sending Message to DiscordWebHook");
     Net::HttpRequest@ response = DiscordWebHook(pb).Send();
 
     if (response.ResponseCode() != 204)
@@ -165,6 +165,10 @@ void SendDiscordWebHook(PB@ pb)
 				UI::HSV(0.10f, 1.0f, 1.0f), 7500);
         error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
         error(response.Error());
+    }
+    else
+    {
+        Log("Sent to Discord");
     }
 }
 

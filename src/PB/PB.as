@@ -13,7 +13,7 @@ class PB
         PreviousClubPosition = previousPosition;
         ClubPosition = position;
         WorldPosition = GetPBPosition(map.Uid, score);
-        Medal = GetReachedMedal(Map, Score);
+        Medal = GetReachedMedal(Map, score);
         PreviousScore = previousScore;
         Score = (score < Map.AuthorMedalTime && WeeklyShorts::IsWeeklyShorts(map))? -1 : score;
         BuildLeaderboard();
