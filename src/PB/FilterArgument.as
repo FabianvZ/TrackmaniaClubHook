@@ -38,9 +38,9 @@ namespace FilterArgument
         switch (filterArgument)
         {
             case FilterArgument::Time:
-                return pb.Leaderboard.getScore();
+                return pb.Score;
             case FilterArgument::Rank:
-                return pb.Position;
+                return pb.WorldPosition;
             case FilterArgument::Medal:
                 return Medal::ToValue(pb.Medal);
         }

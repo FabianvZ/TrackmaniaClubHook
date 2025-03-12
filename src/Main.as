@@ -73,7 +73,7 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    uint previousScore;
+    uint previousScore, previousPosition;
 
     while (true)
     {
@@ -92,8 +92,8 @@ void PBLoop()
             continue;
         }
 
-        // Map is not published
-        if (currentMap.MapInfo.MapUid.Length == 0)
+        // Map is not published or should not send pb (as set in settings)
+        if (currentMap.MapInfo.MapUid.Length == 0 || !settings_SendPB)
         {
             sleep(3000);
             continue;
@@ -105,6 +105,7 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             previousScore = GetCurrBestTime(app, map.Uid);
+            previousPosition = GetClubLeaderboardPosition(map.Uid, previousScore);
             continue;
         }
 
@@ -113,15 +114,17 @@ void PBLoop()
 
         if (previousScore > currentPB) {
             Log("New PB: " + currentPB);
-            Leaderboard@ leaderboard = Leaderboard(user, map, currentPB);
-            
-            if (leaderboard.HasBeatenClubMember) {
-                PB @pb = PB(user, map, previousScore, leaderboard);
 
-                if (settings_SendPB && FilterSolver::FromSettings().Solve(pb))
+            uint position = GetClubLeaderboardPosition(map.Uid, currentPB);
+            if (position < previousPosition) {
+
+                PB @pb = PB(user, map, previousScore, currentPB, previousPosition, position);
+
+                if (FilterSolver::FromSettings().Solve(pb))
                     Log("Sending PB to Discord");
                     SendDiscordWebHook(pb);
 
+                previousPosition = position;
             }
             previousScore = currentPB;
         }
@@ -135,6 +138,18 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     auto score_manager = app.Network.ClientManiaAppPlayground.ScoreMgr;
     auto user = user_manager.Users[0];
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
+}
+
+uint GetClubLeaderboardPosition(const string &in mapUid, uint score) 
+{
+    Json::Value@ requestbody = Json::Object();
+    requestbody["maps"] = Json::Array();
+    Json::Value mapJson = Json::Object();
+    mapJson["mapUid"] = mapUid;
+    mapJson["groupUid"] = "Personal_Best";
+    requestbody["maps"].Add(mapJson);
+    Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map/club/" + clubId + "?scores[" + mapUid +  "]=" + score, requestbody);
+    return personalBest[0]["position"];
 }
 
 void SendDiscordWebHook(PB@ pb)
