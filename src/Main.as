@@ -73,7 +73,7 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    uint previousScore, previousPosition;
+    uint previousScore;
 
     while (true)
     {
@@ -105,7 +105,6 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             previousScore = GetCurrBestTime(app, map.Uid);
-            previousPosition = GetClubLeaderboardPosition(map.Uid, previousScore);
             continue;
         }
 
@@ -115,6 +114,7 @@ void PBLoop()
         if (previousScore > currentPB) {
             Log("New PB: " + previousScore + " -> " + currentPB);
 
+            uint previousPosition = GetClubLeaderboardPosition(map.Uid, previousScore);
             uint position = GetClubLeaderboardPosition(map.Uid, currentPB);
             Log("Club Position: " + previousPosition + " -> " + position);
             if (position < previousPosition) {
@@ -125,7 +125,6 @@ void PBLoop()
                     Log("Passed filters");
                     SendDiscordWebHook(pb);
 
-                previousPosition = position;
             }
             previousScore = currentPB;
         }

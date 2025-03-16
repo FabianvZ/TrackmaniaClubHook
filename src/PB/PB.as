@@ -57,9 +57,9 @@ class PB
 
             if (i >= ClubPosition - 1 && i < PreviousClubPosition - 1) {
                 Losers += GetDiscordUserId(username);
-                if (i < PreviousClubPosition - 3) {
+                if (i + 3 < PreviousClubPosition) {
                     Losers += ", ";
-                } else if (i == PreviousClubPosition - 3) {
+                } else if (i + 3 == PreviousClubPosition) {
                     Losers += " & ";
                 }
             }
