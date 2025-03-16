@@ -121,9 +121,10 @@ void PBLoop()
 
                 PB @pb = PB(user, map, previousScore, currentPB, previousPosition, position);
 
-                if (FilterSolver::FromSettings().Solve(pb))
+                if (FilterSolver::FromSettings().Solve(pb)) {
                     Log("Passed filters");
                     SendDiscordWebHook(pb);
+                }
 
             }
             previousScore = currentPB;

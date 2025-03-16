@@ -33,36 +33,6 @@ class FilterSolver
             Filters[i].Solve(pb);
 
         return LogicalConnection::Solve(Filters);
-        /*
-        array<bool> values;
-        bool temp = true;
-        for (uint i = 0; i < Filter.Length; i++)
-        {
-            auto filter = Filters[i];
-            if (filter.Calculate(PB) && temp)
-            {
-                if (filter.LogicalConnection == LogicalConnection::OR)
-                {
-                    values.InsertLast(temp);
-                    temp = true;
-                }
-
-                continue;
-            }
-            temp = false;
-            if (filter.LogicalConnection == LogicalConnection::OR)
-            {
-                values.InsertLast(temp);
-                temp = true;
-            }
-        }
-        values.InsertLast(temp);
-
-        for (uint i = 0; i < values.Length; i++)
-            if (values[i]) return true;
-
-        return false;
-        */
     }
 }
 

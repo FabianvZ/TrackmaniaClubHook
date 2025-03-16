@@ -28,7 +28,6 @@ class PB
         mapJson["groupUid"] = "Personal_Best";
         requestbody["maps"].Add(mapJson);
         Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map?scores[" + mapUid +  "]=" + time, requestbody);
-        Log(Json::Write(personalBest));
         return personalBest[0]['zones'][0]["ranking"]["position"];
     }
 

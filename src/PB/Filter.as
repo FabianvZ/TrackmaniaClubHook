@@ -19,6 +19,7 @@ class Filter
         int argumentValue = FilterArgument::GetValue(FilterArgument, pb);
         int filterValue = FilterValue.Value;
         Result = Comparison::Compare(Comparison, argumentValue, filterValue);
+        Log("Filter: " + Serialize() + " = " + argumentValue + " " + Comparison::ToString(Comparison) + " " + filterValue + " = " + Result);
     }
 
     string Serialize()
@@ -28,6 +29,7 @@ class Filter
                 "," + FilterValue.ToString() + 
                 "," + LogicalConnection::ToString(LogicalConnection) + ";";
     }
+
 }
 
 namespace Filter
