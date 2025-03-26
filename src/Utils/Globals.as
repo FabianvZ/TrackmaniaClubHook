@@ -32,27 +32,47 @@ namespace DiscordDefaults
                 "name": "Rank",
                 "value": "[Rank]",
                 "inline": true
+            },
+            {
+                "name": "\u200B",
+                "value": "\u200B",
+                "inline": true
+            },
+            {
+                "name": "GrindTime",
+                "value": "[GrindTime]",
+                "inline": false
+            },
+            {
+                "name": "Finishes",
+                "value": "[Finishes]",
+                "inline": true
+            },
+            {
+                "name": "Resets",
+                "value": "[Resets]",
+                "inline": true
+            },
+            {
+                "name": "\u200B",
+                "value": "\u200B",
+                "inline": true
+            },
+            {
+                "name": "Club Leaderboard",
+                "value": "[ClubLeaderboard]",
+                "inline": true
+            },
+            {
+                "name": "\u200B",
+                "value": "[Times]",
+                "inline": true
+            },
+            {
+                "name": "\u200B",
+                "value": "\u200B",
+                "inline": true
             }
-                ,
-                {
-                    "name": "GrindTime",
-                    "value": "[GrindTime]",
-                    "inline": false
-                },
-                {
-                    "name": "Finishes",
-                    "value": "[Finishes]",
-                    "inline": true
-                },
-                {
-                    "name": "Resets",
-                    "value": "[Resets]",
-                    "inline": true
-                },
-                {
-                    "name": "Club Leaderboard",
-                    "value": "[ClubLeaderboard]"
-                }
             ],
             "thumbnail": {
                 "url": "[ThumbnailLink]"

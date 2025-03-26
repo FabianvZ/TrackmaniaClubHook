@@ -4,7 +4,7 @@ class PB
     User@ User;
     Medal Medal;
     uint PreviousScore, Score, PreviousClubPosition, ClubPosition, WorldPosition;
-    string Leaderboard = "", Losers = "";
+    string Leaderboard = "", Times = "", Losers = "";
 
     PB(User@ user, Map@ map, uint previousScore, uint score, uint previousPosition, uint position)
     {
@@ -38,13 +38,14 @@ class PB
 
         for(uint i = 0; i < leaderboard.Length; i++) {
 
-            if (leaderboard[i]["accountId"] == User.Id) {
-                continue;
-            }
-
             if (i == ClubPosition - 1) {
                 InsertLeaderBoardEntry(position++, User.Name, Score);
                 Leaderboard += "\\n";
+                Times += "\\n";
+            }
+
+            if (leaderboard[i]["accountId"] == User.Id) {
+                continue;
             }
 
             string username = GetPlayerDisplayName(leaderboard[i]["accountId"]);
@@ -52,6 +53,7 @@ class PB
             InsertLeaderBoardEntry(position++, username, leaderboard[i]["score"]);
             if (i != leaderboard.Length - 1) {
                 Leaderboard += "\\n";
+                Times += "\\n";
             }
 
             if (i >= ClubPosition - 1 && i < PreviousClubPosition - 1) {
@@ -67,7 +69,8 @@ class PB
 
     private void InsertLeaderBoardEntry(int position, const string &in username, uint score) 
     {
-        Leaderboard += (position + 1) + ": " + username + " : " + (score == uint(-1)? "Secret" : Time::Format(score));
+        Leaderboard += (position + 1) + ": " + username;
+        Times += (score == uint(-1)? "Secret" : Time::Format(score));
     }
 
     private string GetDiscordUserId(const string &in TMUsername){

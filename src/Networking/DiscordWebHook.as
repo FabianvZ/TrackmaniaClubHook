@@ -29,6 +29,7 @@ class DiscordWebHook : WebRequest
         parts[i] = Regex::Replace(parts[i], "\\[Finishes\\]", GrindingStats::GetSessionFinishes() +  " / " + GrindingStats::GetTotalFinishes());
         parts[i] = Regex::Replace(parts[i], "\\[Resets\\]", GrindingStats::GetSessionResets() + " / " + GrindingStats::GetTotalResets());
         parts[i] = Regex::Replace(parts[i], "\\[ClubLeaderboard\\]", pb.Leaderboard);
+        parts[i] = Regex::Replace(parts[i], "\\[Times\\]", pb.Times);
         parts[i] = Regex::Replace(parts[i], "\\[Losers\\]", pb.Losers);
     }
 
