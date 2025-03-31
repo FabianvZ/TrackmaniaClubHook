@@ -55,11 +55,6 @@ void PBLoop()
     while (true)
     {
 
-        if (test_position) {
-            test_position = false;
-            test_position_result = GetClubLeaderboardPosition(map.Uid, test_position_time);
-        }
-
         if (reloadclubs)
         {
             clubs = Nadeo::LiveServiceRequest("/api/token/club/mine?length=100&offset=0");
@@ -93,6 +88,16 @@ void PBLoop()
 
         uint currentPB = force_send_pb? force_send_pb_time : GetCurrBestTime(app, map.Uid);
         force_send_pb = false;
+
+        if (test_position) {
+            test_position = false;
+            test_position_result = GetClubLeaderboardPosition(map.Uid, test_position_time)["position"];
+        }
+
+        if (test_world_position) {
+            test_world_position = false;
+            test_world_position_result = PB(user, map, test_world_position_time, test_world_position_time, previousPosition, previousPosition).WorldPosition;
+        }
 
         if (send_pb_manual) {
             send_pb_manual = false;

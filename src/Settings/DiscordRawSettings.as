@@ -99,6 +99,21 @@ bool test_position;
 #endif
 int test_position_result;
 
+#if SIG_DEVELOPER
+[Setting name="World Position request score" category="Testing"]
+#endif
+int test_world_position_time;
+
+#if SIG_DEVELOPER
+[Setting name="World Request position" category="Testing"]
+#endif
+bool test_world_position;
+
+#if SIG_DEVELOPER
+[Setting name="World Test position result" category="Testing"]
+#endif
+int test_world_position_result;
+
 bool showImportPopup = false;
 
 string import_settings_usernames = "";
