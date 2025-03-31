@@ -34,6 +34,7 @@ class PB
     private void BuildLeaderboard()
     {
         Json::Value leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + Map.Uid + "/club/" + clubId + "/top?length=50&offset=0")["top"];
+        Log(Json::Write(leaderboard));
         int position = 0;
 
         for(uint i = 0; i < leaderboard.Length; i++) {

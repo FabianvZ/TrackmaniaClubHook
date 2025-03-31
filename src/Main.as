@@ -37,33 +37,10 @@ void Main()
 				"Discord webhook is not set in settings. This is needed to send leaderboards!",
 				UI::HSV(0.55f, 1.0f, 1.0f), 7500);
     }
+    sendPBShortcut.key = togglePBKey;
+    forceSendShortcut.key = forceSendKey;
     migrateOldData();
     startnew(PBLoop);
-}
-
-bool shortcutPressed;
-
-void OnKeyPress(bool down, VirtualKey key)
-{      
-    if (recordShortcut) {
-        shortcutKey = key;
-        recordShortcut = false;
-        shortcutPressed = true;
-    }
-
-    if (key == shortcutKey) {
-        if (down && !shortcutPressed) {
-            shortcutPressed = true;
-            settings_SendPB = !settings_SendPB;
-            UI::ShowNotification(
-                "Discord Rivalry Ping",
-                "Toggled sending PBs to Discord: " + (settings_SendPB ? "Enabled" : "Disabled"),
-                UI::HSV(0.55f, 1.0f, 1.0f), 7500);
-        } 
-        else if (!down) {
-            shortcutPressed = false;
-        }
-    }
 }
 
 void PBLoop()
@@ -73,10 +50,15 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    uint previousScore;
+    uint previousScore, previousPosition;
 
     while (true)
     {
+
+        if (test_position) {
+            test_position = false;
+            test_position_result = GetClubLeaderboardPosition(map.Uid, test_position_time);
+        }
 
         if (reloadclubs)
         {
@@ -105,17 +87,30 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             previousScore = GetCurrBestTime(app, map.Uid);
+            previousPosition = GetClubLeaderboardPosition(map.Uid, previousScore)["position"];
             continue;
         }
 
         uint currentPB = force_send_pb? force_send_pb_time : GetCurrBestTime(app, map.Uid);
         force_send_pb = false;
 
+        if (send_pb_manual) {
+            send_pb_manual = false;
+            PB @pb = PB(user, map, previousScore, currentPB, previousPosition, previousPosition);
+            SendDiscordWebHook(pb);
+        }
+
         if (previousScore > currentPB) {
             Log("New PB: " + previousScore + " -> " + currentPB);
 
-            uint previousPosition = GetClubLeaderboardPosition(map.Uid, previousScore);
-            uint position = GetClubLeaderboardPosition(map.Uid, currentPB);
+            uint position;
+            Json::Value@ positionRequest = GetClubLeaderboardPosition(map.Uid, previousScore);
+            if (uint(positionRequest["score"]) == previousScore) {
+                previousPosition = positionRequest["position"];
+                position = GetClubLeaderboardPosition(map.Uid, currentPB)["position"];
+            } else {
+                position = positionRequest["position"];
+            }
             Log("Club Position: " + previousPosition + " -> " + position);
             if (position < previousPosition) {
 
@@ -127,6 +122,7 @@ void PBLoop()
                 }
 
             }
+            previousPosition = position;
             previousScore = currentPB;
         }
         sleep(1000);
@@ -141,7 +137,7 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
 }
 
-uint GetClubLeaderboardPosition(const string &in mapUid, uint score) 
+Json::Value@ GetClubLeaderboardPosition(const string &in mapUid, uint score) 
 {
     Json::Value@ requestbody = Json::Object();
     requestbody["maps"] = Json::Array();
@@ -149,8 +145,9 @@ uint GetClubLeaderboardPosition(const string &in mapUid, uint score)
     mapJson["mapUid"] = mapUid;
     mapJson["groupUid"] = "Personal_Best";
     requestbody["maps"].Add(mapJson);
-    Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map/club/" + clubId + "?scores[" + mapUid +  "]=" + score, requestbody);
-    return personalBest[0]["position"];
+    Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map/club/" + clubId + "?scores[" + mapUid +  "]=" + score, requestbody)[0];
+    Log(Json::Write(personalBest));
+    return personalBest;
 }
 
 void SendDiscordWebHook(PB@ pb)

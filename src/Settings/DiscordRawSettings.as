@@ -84,12 +84,23 @@ bool force_send_pb = false;
 #endif
 int force_send_pb_time = 1;
 
+#if SIG_DEVELOPER
+[Setting name="Position request score" category="Testing"]
+#endif
+int test_position_time;
+
+#if SIG_DEVELOPER
+[Setting name="Request position" category="Testing"]
+#endif
+bool test_position;
+
+#if SIG_DEVELOPER
+[Setting name="Test position result" category="Testing"]
+#endif
+int test_position_result;
+
 bool showImportPopup = false;
 
 string import_settings_usernames = "";
 
 string import_error_message = "";
-
-[Setting hidden]
-VirtualKey shortcutKey;
-bool recordShortcut = false;

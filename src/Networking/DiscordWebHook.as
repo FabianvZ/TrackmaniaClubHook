@@ -13,6 +13,10 @@ class DiscordWebHook : WebRequest
     array<string> parts = settings_Body.Split("[[");
     for (uint i = 0; i < parts.Length; i++)
     {
+        if (pb.PreviousClubPosition == pb.ClubPosition) {
+            parts[i] = Regex::Replace(parts[i], "beating", "");
+            parts[i] = Regex::Replace(parts[i], "new ", "");
+        }
         parts[i] = Regex::Replace(parts[i], "\\[UserName\\]", pb.User.Name);
         parts[i] = Regex::Replace(parts[i], "\\[UserLink\\]", URL::TrackmaniaIOPlayer + pb.User.Id);
         parts[i] = Regex::Replace(parts[i], "\\[UserDiscordId\\]", settings_discord_user_id);
