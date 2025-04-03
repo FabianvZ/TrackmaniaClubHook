@@ -4,7 +4,7 @@ class PB
     User@ User;
     Medal Medal;
     uint PreviousScore, Score, PreviousClubPosition, ClubPosition, WorldPosition;
-    string Leaderboard = "", Times = "", Losers = "";
+    string Leaderboard = "", Losers = "";
 
     PB(User@ user, Map@ map, uint previousScore, uint score, uint previousPosition, uint position)
     {
@@ -15,7 +15,7 @@ class PB
         WorldPosition = GetPBPosition(map.Uid, score);
         Medal = GetReachedMedal(Map, score);
         PreviousScore = previousScore;
-        Score = (score < Map.AuthorMedalTime && WeeklyShorts::IsWeeklyShorts(map))? -1 : score;
+        Score = (score < Map.AuthorMedalTime && WeeklyShorts::IsWeeklyShorts(map)) ? -1 : score;
         BuildLeaderboard();
     }
 
@@ -37,13 +37,16 @@ class PB
         Json::Value leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + Map.Uid + "/club/" + clubId + "/top?length=50&offset=0")["top"];
         Log(Json::Write(leaderboard));
         int position = 0;
+        int maxUsernameLength = 0;
 
-        for(uint i = 0; i < leaderboard.Length; i++) {
+        // Determine max username length for padding
+        for (uint i = 0; i < leaderboard.Length; i++) {
+            maxUsernameLength = Math::Max(maxUsernameLength, GetPlayerDisplayName(leaderboard[i]["accountId"]).Length);
+        }
 
+        for (uint i = 0; i < leaderboard.Length; i++) {
             if (i == ClubPosition - 1) {
-                InsertLeaderBoardEntry(position++, User.Name, Score);
-                Leaderboard += "\\n";
-                Times += "\\n";
+                InsertLeaderBoardEntry(position++, User.Name, Score, maxUsernameLength);
             }
 
             if (leaderboard[i]["accountId"] == User.Id) {
@@ -51,12 +54,7 @@ class PB
             }
 
             string username = GetPlayerDisplayName(leaderboard[i]["accountId"]);
-
-            InsertLeaderBoardEntry(position++, username, leaderboard[i]["score"]);
-            if (i != leaderboard.Length - 1) {
-                Leaderboard += "\\n";
-                Times += "\\n";
-            }
+            InsertLeaderBoardEntry(position++, username, leaderboard[i]["score"], maxUsernameLength);
 
             if (i >= ClubPosition - 1 && i < PreviousClubPosition - 1) {
                 Losers += GetDiscordUserId(username);
@@ -69,23 +67,27 @@ class PB
         }
     }
 
-    private void InsertLeaderBoardEntry(int position, const string &in username, uint score) 
+    private void InsertLeaderBoardEntry(int position, const string &in username, uint score, int maxUsernameLength)
     {
-        Leaderboard += (position + 1) + ": " + username;
-        Times += (score == uint(-1)? "Secret" : Time::Format(score));
+        string paddedUsername = username;
+        for (int i = username.Length; i < maxUsernameLength; i++) {
+            paddedUsername += " ";
+        }
+        string timeString = (score == uint(-1) ? "Secret" : Time::Format(score));
+        Leaderboard += (position + 1) + ": " + paddedUsername + " " + timeString + "\\n";
     }
 
-    private string GetDiscordUserId(const string &in TMUsername){
+    private string GetDiscordUserId(const string &in TMUsername)
+    {
         array<string> parts = settings_usernames.Split("\n");
-
         for (uint i = 0; i < parts.Length; i++)
         {
             array<string> nameParts = parts[i].Split(";");
-            if(nameParts[0] == TMUsername){
+            if (nameParts[0] == TMUsername)
+            {
                 return "<@" + nameParts[1] + ">";
             }
         }
-
         return TMUsername;
     }
 

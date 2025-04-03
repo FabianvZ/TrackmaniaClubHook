@@ -166,7 +166,7 @@ void SendDiscordWebHook(PB@ pb)
 				"Sending to discord webhook failed.",
 				UI::HSV(0.10f, 1.0f, 1.0f), 7500);
         error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
-        error(response.Error());
+        Log(response.Error());
     }
     else
     {

@@ -13,7 +13,6 @@ namespace DiscordDefaults
     {
         "username": "Trackmania",
         "avatar_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCHBYTbusq8rivJAHP59YQbUtiqoqpbiPUS2Mdxi_pDgiYqGtttj0sS3EO05JS6Xama2A&usqp=CAU",
-        "flags": 4096,
         "content": "#[[[UserName]]([UserLink]) (<@[UserDiscordId]>) got a new PB [Medal] beating [Losers]",
         "embeds": [
         {
@@ -34,14 +33,8 @@ namespace DiscordDefaults
                 "inline": true
             },
             {
-                "name": "\u200B",
-                "value": "\u200B",
-                "inline": true
-            },
-            {
                 "name": "GrindTime",
-                "value": "[GrindTime]",
-                "inline": false
+                "value": "[GrindTime]"
             },
             {
                 "name": "Finishes",
@@ -54,24 +47,8 @@ namespace DiscordDefaults
                 "inline": true
             },
             {
-                "name": "\u200B",
-                "value": "\u200B",
-                "inline": true
-            },
-            {
                 "name": "Club Leaderboard",
-                "value": "[ClubLeaderboard]",
-                "inline": true
-            },
-            {
-                "name": "\u200B",
-                "value": "[Times]",
-                "inline": true
-            },
-            {
-                "name": "\u200B",
-                "value": "\u200B",
-                "inline": true
+                "value": "```[ClubLeaderboard]```"
             }
             ],
             "thumbnail": {
