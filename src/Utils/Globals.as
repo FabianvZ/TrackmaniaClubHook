@@ -13,6 +13,7 @@ namespace DiscordDefaults
     {
         "username": "Trackmania",
         "avatar_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCHBYTbusq8rivJAHP59YQbUtiqoqpbiPUS2Mdxi_pDgiYqGtttj0sS3EO05JS6Xama2A&usqp=CAU",
+        "flags": 4096,
         "content": "#[[[UserName]]([UserLink]) (<@[UserDiscordId]>) got a new PB [Medal] beating [Losers]",
         "embeds": [
         {
