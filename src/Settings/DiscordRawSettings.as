@@ -61,13 +61,13 @@ string settings_at_medal_string = DiscordDefaults::AuthorMedal;
 string settings_champion_medal_string = DiscordDefaults::ChampionMedal;
 
 [Setting hidden]
-string settings_Body = DiscordDefaults::Body;
-
-[Setting hidden]
 string settings_usernames = DiscordDefaults::usernames;
 
 [Setting hidden]
 bool settings_debug_log = true;
+
+[Setting hidden]
+bool settings_inline_columns = false;
 
 [Setting hidden]
 int clubId = -1;

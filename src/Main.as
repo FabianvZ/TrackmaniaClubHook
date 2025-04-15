@@ -158,6 +158,8 @@ Json::Value@ GetClubLeaderboardPosition(const string &in mapUid, uint score)
 void SendDiscordWebHook(PB@ pb)
 {
     Net::HttpRequest@ response = DiscordWebHook(pb).Send();
+    Log(response.Body);
+    Log("Length: " + response.Body.Length);
 
     if (response.ResponseCode() != 204)
     {
@@ -167,6 +169,7 @@ void SendDiscordWebHook(PB@ pb)
 				UI::HSV(0.10f, 1.0f, 1.0f), 7500);
         error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
         Log(response.Error());
+        Log(response.String());
     }
     else
     {

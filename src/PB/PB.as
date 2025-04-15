@@ -4,7 +4,8 @@ class PB
     User@ User;
     Medal Medal;
     uint PreviousScore, Score, PreviousClubPosition, ClubPosition, WorldPosition;
-    string Leaderboard = "", Losers = "";
+    array<string> LeaderboardFragments;
+    string Losers = "";
 
     PB(User@ user, Map@ map, uint previousScore, uint score, uint previousPosition, uint position)
     {
@@ -34,10 +35,11 @@ class PB
 
     private void BuildLeaderboard()
     {
-        Json::Value leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + Map.Uid + "/club/" + clubId + "/top?length=50&offset=0")["top"];
+        Json::Value leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + Map.Uid + "/club/" + clubId + "/top?length=100&offset=0")["top"];
         Log(Json::Write(leaderboard));
         int position = 0;
         int maxUsernameLength = 0;
+        LeaderboardFragments.InsertLast("");
 
         // Determine max username length for padding
         for (uint i = 0; i < leaderboard.Length; i++) {
@@ -56,7 +58,7 @@ class PB
             string username = GetPlayerDisplayName(leaderboard[i]["accountId"]);
             InsertLeaderBoardEntry(position++, username, leaderboard[i]["score"], maxUsernameLength);
 
-            if (i >= ClubPosition - 1 && i < PreviousClubPosition - 1) {
+            if (i >= ClubPosition - 1 && i < PreviousClubPosition) {
                 Losers += GetDiscordUserId(username);
                 if (i + 3 < PreviousClubPosition) {
                     Losers += ", ";
@@ -73,8 +75,16 @@ class PB
         for (int i = username.Length; i < maxUsernameLength; i++) {
             paddedUsername += " ";
         }
+        if (position < 9) {
+            paddedUsername += " ";
+        }
         string timeString = (score == uint(-1) ? "Secret" : Time::Format(score));
-        Leaderboard += (position + 1) + ": " + paddedUsername + " " + timeString + "\\n";
+        string entry = (position + 1) + ": " + paddedUsername + " " + timeString + "\n";
+        if (LeaderboardFragments[LeaderboardFragments.Length - 1].Length + entry.Length > 1024) {
+            LeaderboardFragments.InsertLast(entry);
+        } else {
+            LeaderboardFragments[LeaderboardFragments.Length - 1] += entry;
+        }
     }
 
     private string GetDiscordUserId(const string &in TMUsername)
