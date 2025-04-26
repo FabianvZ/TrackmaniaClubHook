@@ -1,27 +1,21 @@
 class WebhookSetting : JsonSetting {
 
     string WebhookUrl {
-        get { 
-            if (Data.HasKey("WebhookUrl"))
-            {
-                return Data["WebhookUrl"];
-            }
-            return settings_discord_URL;
-            }
+        get { return Data.HasKey("WebhookUrl")? Data["WebhookUrl"] : settings_discord_URL; }
         set { Data["WebhookUrl"] = value; }
     }
 
+    string Name {
+        get { return Data.HasKey("Name")? Data["Name"] : "New Webhook";  }
+        set { Data["Name"] = value; }
+    }
+
     int ClubId {
-        get 
-        { 
-            if (Data.HasKey("ClubId"))
-            {
-                return Data["ClubId"];
-            }
-            return clubId; 
-        }
+        get { return Data.HasKey("ClubId")? Data["ClubId"] : clubId; }
         set { Data["ClubId"] = value; }
     }
+
+    WebhookFilter@ filter;
 
     WebhookSetting(Json::Value@ data) {
         super(data);
@@ -32,6 +26,9 @@ class WebhookSetting : JsonSetting {
         {
             return true;
         }
+
+        UI::Text("Name");
+        Name = UI::InputText("Name", Name);
 
         UI::Text("Url");
         WebhookUrl = UI::InputText("WebhookUrl", WebhookUrl);
@@ -80,6 +77,29 @@ class WebhookSetting : JsonSetting {
         }
 
         return false;
+    }
+
+    void Send(PB@ pb) {
+        if (filter.Solve(pb)) {
+            Net::HttpRequest@ response = DiscordWebHook(pb).Send();
+
+            if (response.ResponseCode() != 204)
+            {
+                UI::ShowNotification(
+                        "Discord Rivalry Ping",
+                        "Sending to discord webhook failed.",
+                        UI::HSV(0.10f, 1.0f, 1.0f), 7500);
+                error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
+                Log(response.Body);
+                Log("Length: " + response.Body.Length);
+                Log(response.Error());
+                Log(response.String());
+            }
+            else
+            {
+                Log("Sent " + Name + " to Discord");
+            }
+        }
     }
 
 }

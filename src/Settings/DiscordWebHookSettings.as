@@ -4,6 +4,11 @@ void RenderDiscordSettings()
     RenderResetButton();
 
     settings_discord_URL = UI::InputText("Discord WebHook-URL", settings_discord_URL);
+    settings_inline_columns = UI::Checkbox("Inline columns in webhook", settings_inline_columns);
+
+    sendPBShortcut.RenderUI();
+    forceSendShortcut.RenderUI();
+    
 #if !DEPENDENCY_DISCORD
     settings_discord_user_id = UI::InputText("Discord User-ID", settings_discord_user_id);
 #endif
@@ -100,12 +105,6 @@ void RenderDiscordSettings()
 		UI::EndTabItem();
     }
     
-    if (UI::BeginTabItem(Icons::File + " Request body"))
-    {
-        settings_Body = UI::InputTextMultiline("Request body", settings_Body);
-		UI::EndTabItem();
-    }
-    
     UI::EndTabBar();
 }
 
@@ -124,7 +123,6 @@ void RenderResetButton()
         settings_gold_medal_string = DiscordDefaults::GoldMedal;
         settings_at_medal_string = DiscordDefaults::AuthorMedal;
         settings_champion_medal_string = DiscordDefaults::ChampionMedal;
-        settings_Body = DiscordDefaults::Body;
         settings_usernames = DiscordDefaults::usernames;
         reloadclubs = true;
     }

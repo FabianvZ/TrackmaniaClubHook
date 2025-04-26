@@ -15,9 +15,6 @@
 bool settings_SendPB = true;
 
 [Setting hidden]
-bool settings_SendRank = true;
-
-[Setting hidden]
 string settings_filter_string = "";
 
 [Setting hidden]
@@ -61,13 +58,13 @@ string settings_at_medal_string = DiscordDefaults::AuthorMedal;
 string settings_champion_medal_string = DiscordDefaults::ChampionMedal;
 
 [Setting hidden]
-string settings_Body = DiscordDefaults::Body;
-
-[Setting hidden]
 string settings_usernames = DiscordDefaults::usernames;
 
 [Setting hidden]
 bool settings_debug_log = true;
+
+[Setting hidden]
+bool settings_inline_columns = false;
 
 [Setting hidden]
 int clubId = -1;
@@ -79,11 +76,44 @@ bool reloadclubs = true;
 #endif
 bool force_send_pb = false;
 
+#if SIG_DEVELOPER
+[Setting name="Send PB Score" category="Testing"]
+#endif
+int force_send_pb_time = 1;
+
+#if SIG_DEVELOPER
+[Setting name="Position request score" category="Testing"]
+#endif
+int test_position_time;
+
+#if SIG_DEVELOPER
+[Setting name="Request position" category="Testing"]
+#endif
+bool test_position;
+
+#if SIG_DEVELOPER
+[Setting name="Test position result" category="Testing"]
+#endif
+int test_position_result;
+
+#if SIG_DEVELOPER
+[Setting name="World Position request score" category="Testing"]
+#endif
+int test_world_position_time;
+
+#if SIG_DEVELOPER
+[Setting name="World Request position" category="Testing"]
+#endif
+bool test_world_position;
+
+#if SIG_DEVELOPER
+[Setting name="World Test position result" category="Testing"]
+#endif
+int test_world_position_result;
+
 bool showImportPopup = false;
 
 string import_settings_usernames = "";
 
 string import_error_message = "";
 
-[Setting hidden]
-string settings_webhooks = "[{}]";	

@@ -1,14 +1,16 @@
+[Setting hidden]
+string settings_webhooks = "[{}]";	
+array<WebhookSetting@> webhooks;
+
 [SettingsTab name="Discord webhooks" icon="DiscordAlt" order=1]
 void RenderDiscordWebhookSettings(){
 
-    Json::Value@ data = Json::Parse(settings_webhooks);
-
     UI::BeginTabBar("DiscordPBMessageSettings", UI::TabBarFlags::FittingPolicyResizeDown);
-    for (int i = 0; i < data.Length; i++) {
-        if (UI::BeginTabItem(Icons::Trophy + " Webhook " + i))
+    for (uint i = 0; i < webhooks.Length; i++) {
+        if (UI::BeginTabItem(Icons::Trophy + " " + webhooks[i].Name +" " + i))
         {
-            if (WebhookSetting(data[i]).Draw()){
-                data.Remove(i);
+            if (WebhookSetting(webhooks[i]).Draw()){
+                webhooks.RemoveAt(i);
             }
             UI::EndTabItem();
         }   
@@ -18,8 +20,8 @@ void RenderDiscordWebhookSettings(){
     UI::Separator();
     if (UI::Button(Icons::Plus + " Add a webhook"))
     {
-        data.Add(Json::Object());
+        webhooks.InsertLast(WebhookSetting(Json::Object()));
     }
 
-    settings_webhooks = Json::Write(data);
+    settings_webhooks = Json::Write(webhooks);
 }
