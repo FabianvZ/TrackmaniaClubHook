@@ -9,12 +9,13 @@ class DiscordWebHook : WebRequest
     string GetInterpolatedBody(PB@ pb)
     {
         Map@ map = pb.Map;
+        bool improved = pb.ClubPosition != pb.PreviousClubPosition;
 
         Json::Value@ body = Json::Object();
         body["username"] = "Trackmania";
         body["avatar_url"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCHBYTbusq8rivJAHP59YQbUtiqoqpbiPUS2Mdxi_pDgiYqGtttj0sS3EO05JS6Xama2A&usqp=CAU";
         body["flags"] = 4096;
-        body["content"] = "#[" + pb.User.Name + "](" + URL::TrackmaniaIOPlayer + pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a new PB " + Medal::ToDiscordString(pb.Medal) + " beating " + pb.Losers;
+        body["content"] = "#" + pb.User.Name + "(" + URL::TrackmaniaIOPlayer + pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a " + improved? " new" : "" + " PB " + Medal::ToDiscordString(pb.Medal) + improved? " beating " + pb.Losers : "";
 
         body["embeds"] = Json::Array();
         body["embeds"].Add(Json::Object());
@@ -29,7 +30,7 @@ class DiscordWebHook : WebRequest
         AddField(fields, "GrindTime", Time::Format(GrindingStats::GetSessionTime()) +  " / " + Time::Format(GrindingStats::GetTotalTime()));
         AddField(fields, "Finishes", GrindingStats::GetSessionFinishes() +  " / " + GrindingStats::GetTotalFinishes(), true);
         AddField(fields, "Resets", GrindingStats::GetSessionResets() + " / " + GrindingStats::GetTotalResets(), true);
-        AddField(fields, "Club Position", pb.PreviousClubPosition + " -> " + pb.ClubPosition);
+        AddField(fields, "Club Position", pb.PreviousClubPosition + improved? " -> " + pb.ClubPosition : "");
         for (int i = 0; i < pb.LeaderboardFragments.Length; i++) {
             AddField(fields, i == 0? "Leaderboard" : "\u200B", "```" + pb.LeaderboardFragments[i] + "```", settings_inline_columns);
         }
