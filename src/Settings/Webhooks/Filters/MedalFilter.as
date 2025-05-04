@@ -1,20 +1,39 @@
-class MedalFilter : WebhookFilter {
+class MedalFilter : OrdinalWebhookFilter {
 
-    string Medal {
-        get {
-            if (Data.HasKey("Medal"))
+    Medal Medal {
+        get { return Data.HasKey("Medal")?  Medal::FromValue(Data["Medal"]) : Medal::Author; }
+        set { Data["Medal"] = value; }
+    }
+
+    MedalFilter(Json::Value@ data, const string &in label) {
+        super(data, label);
+    }
+
+    void DrawOrdinalValue() override {
+        UI::SetNextItemWidth(120.0f);
+        if (UI::BeginCombo("##Medal" + label, Medal::ToString(Medal))) {
+            if (UI::Selectable(Medal::ToString(Medal::Author), Medal == Medal::Author))
             {
-                return Data["Medal"];
-            }
-            return "";
-        }
-        set {
-            Data["Medal"] = value;
+                Medal = Medal::Author;
+            } else if (UI::Selectable(Medal::ToString(Medal::Gold), Medal == Medal::Gold))
+            {
+                Medal = Medal::Gold;
+            } else if (UI::Selectable(Medal::ToString(Medal::Silver), Medal == Medal::Silver))
+            {
+                Medal = Medal::Silver;
+            } else if (UI::Selectable(Medal::ToString(Medal::Bronze), Medal == Medal::Bronze))
+            {
+                Medal = Medal::Bronze;
+            } else if (UI::Selectable(Medal::ToString(Medal::No), Medal == Medal::No))
+            {
+                Medal = Medal::No;
+            } 
+            UI::EndCombo();
         }
     }
 
-    MedalFilter(Json::Value@ data, string label) {
-        super(data, label);
+    int GetValue(PB@ pb) override {
+        return pb.Medal;
     }
 
 }

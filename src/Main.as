@@ -39,10 +39,15 @@ void Main()
     }
     sendPBShortcut.key = togglePBKey;
     forceSendShortcut.key = forceSendKey;
-    Json::Value@ webhooksJson = Json::Parse(settings_webhooks);
-    for (uint i = 0; i < webhooksJson.Length; i++)
+    @WebhookSettings::_webhooks = Json::Parse(WebhookSettings::settings_webhooks);
+    if (WebhookSettings::_webhooks.GetType() != Json::Type::Array)
     {
-        webhooks.InsertLast(WebhookSetting(webhooksJson[i]));
+        @WebhookSettings::_webhooks = Json::Array();
+    }
+    for (uint i = 0; i < WebhookSettings::_webhooks.Length; i++)
+    {
+        Log(Json::Write(WebhookSettings::_webhooks[i]));
+        WebhookSettings::webhooks.InsertLast(@WebhookSetting(WebhookSettings::_webhooks[i]));
     }
     migrateOldData();
     startnew(PBLoop);
@@ -136,9 +141,9 @@ void PBLoop()
 
 void SendDiscordWebHook(PB@ pb)
 {
-    for (uint i = 0; i < webhooks.Length; i++)
+    for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
     {
-        webhooks[i].Send(pb);
+        WebhookSettings::webhooks[i].Send(pb);
     }
 }
 

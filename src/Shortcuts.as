@@ -68,8 +68,3 @@ void OnKeyPress(bool down, VirtualKey key) {
             UI::HSV(0.55f, 1.0f, 1.0f), 7500);
     }
 }
-
-void RenderUI() {
-    sendPBShortcut.RenderUI();
-    forceSendShortcut.RenderUI();
-}

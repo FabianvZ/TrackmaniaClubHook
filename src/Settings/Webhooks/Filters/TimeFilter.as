@@ -1,37 +1,45 @@
-class TimeFilter : WebhookFilter {
+class TimeFilter : OrdinalWebhookFilter {
 
-    string TimeUnit {
-        get {
-            if (Data.HasKey("TimeUnit"))
-            {
-                return Data["TimeUnit"];
-            }
-            return "Seconds";
-        }
-        set {
-            Data["TimeUnit"] = value;
-        }
+    TimeUnit timeUnit {
+        get { return Data.HasKey("TimeUnit")? TimeUnit::FromValue(Data["TimeUnit"]) : TimeUnit::Milliseconds; }
+        set { Data["TimeUnit"] = value; }
     }
 
-    int Value {
-        get {
-            if (Data.HasKey("Value"))
-            {
-                return Data["Value"];
-            }
-            return 0;
-        }
-        set {
-            Data["Value"] = value;
-        }
-    }
-
-    TimeFilter(Json::Value@ data, string label) {
+    TimeFilter(Json::Value@ data, const string &in label) {
         super(data, label);
     }
 
-    bool Draw() override {
-        return false;
+    void DrawOrdinalValue() override {
+        UI::SetNextItemWidth(120.0f);
+        Value = UI::InputInt("##TimeValue" + label, Value);
+    }
+
+    void DrawOrdinalType() override {
+        UI::SetNextItemWidth(110.0f);
+        if (UI::BeginCombo("##TimeUnit" + label, TimeUnit::ToString(timeUnit))) {
+            if (UI::Selectable(TimeUnit::ToString(TimeUnit::Milliseconds), timeUnit == TimeUnit::Milliseconds))
+            {
+                timeUnit = TimeUnit::Milliseconds;
+            } else if (UI::Selectable(TimeUnit::ToString(TimeUnit::Seconds), timeUnit == TimeUnit::Seconds))
+            {
+                timeUnit = TimeUnit::Seconds;
+            } else if (UI::Selectable(TimeUnit::ToString(TimeUnit::Minutes), timeUnit == TimeUnit::Minutes))
+            {
+                timeUnit = TimeUnit::Minutes;
+            }
+            UI::EndCombo();
+        }
+    }
+
+    int GetValue(PB@ pb) override {
+        if (timeUnit == TimeUnit::Milliseconds) {
+            return pb.Score;
+        } else if (timeUnit == TimeUnit::Seconds) {
+            return pb.Score / 1000;
+        } else if (timeUnit == TimeUnit::Minutes) {
+            return pb.Score / 60000;
+        }
+        return 0;
     }
 
 }

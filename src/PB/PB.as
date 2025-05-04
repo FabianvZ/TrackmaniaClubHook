@@ -3,7 +3,7 @@ class PB
     Map@ Map;
     User@ User;
     Medal Medal;
-    uint PreviousScore, Score, PreviousClubPosition, ClubPosition, WorldPosition;
+    uint PreviousScore, Score, PreviousClubPosition, ClubPosition, WorldPosition, ContinentPosition, CountryPosition, ProvincePosition;
     array<string> LeaderboardFragments;
     string Losers = "";
 
@@ -13,14 +13,14 @@ class PB
         @Map = map;
         PreviousClubPosition = previousPosition;
         ClubPosition = position;
-        WorldPosition = GetPBPosition(map.Uid, score);
+        SetPBPosition(map.Uid, score);
         Medal = GetReachedMedal(Map, score);
         PreviousScore = previousScore;
         Score = (score <= Map.AuthorMedalTime && Campaign::WeeklyShorts.IsCurrentCampaignMap(map)) ? -1 : score;
         BuildLeaderboard();
     }
 
-    private int GetPBPosition(const string &in mapUid, uint time)
+    private void SetPBPosition(const string &in mapUid, uint time)
     {
         Json::Value@ requestbody = Json::Object();
         requestbody["maps"] = Json::Array();
@@ -28,9 +28,12 @@ class PB
         mapJson["mapUid"] = mapUid;
         mapJson["groupUid"] = "Personal_Best";
         requestbody["maps"].Add(mapJson);
-        Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map?scores[" + mapUid +  "]=" + time, requestbody);
-        Log(Json::Write(personalBest[0]));
-        return personalBest[0]['zones'][0]["ranking"]["position"];
+        Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map?scores[" + mapUid +  "]=" + time, requestbody)[0];
+        Log(Json::Write(personalBest));
+        WorldPosition = personalBest["zones"][0]["ranking"]["position"];
+        ContinentPosition = personalBest["zones"][1]["ranking"]["position"];   
+        CountryPosition = personalBest["zones"][2]["ranking"]["position"];
+        ProvincePosition = personalBest["zones"][3]["ranking"]["position"]; 
     }
 
     private void BuildLeaderboard()

@@ -1,10 +1,10 @@
 namespace Nadeo
 {
-    Json::Value LiveServiceRequest(const string &in route)
+    Json::Value LiveServiceRequest(const string &in route, const string &in baseRoute = NadeoServices::BaseURLLive())
     {
         while (!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 
-        auto req = NadeoServices::Get("NadeoLiveServices", NadeoServices::BaseURLLive() + route);
+        auto req = NadeoServices::Get("NadeoLiveServices", baseRoute + route);
 
         req.Start();
 

@@ -1,9 +1,12 @@
 enum FilterType {
     Comparison,
-    TimeUnit,
-    Map,
+    Time,
+    MapName,
     Medal,
-    Campaign
+    CurrentCampaign,
+    Rank,
+    TrackOfTheDay,
+    WeeklyShorts
 }
 
 namespace FilterType {
@@ -12,14 +15,20 @@ namespace FilterType {
         switch (filterType) {
             case FilterType::Comparison:
                 return "Comparison";
-            case FilterType::TimeUnit:
-                return "TimeUnit";
-            case FilterType::Map:
-                return "Map";
+            case FilterType::Time:
+                return "Time";
+            case FilterType::MapName:
+                return "Map Name";
             case FilterType::Medal:
                 return "Medal";
-            case FilterType::Campaign:
-                return "Campaign";
+            case FilterType::CurrentCampaign:
+                return "Current Campaign";
+            case FilterType::WeeklyShorts:
+                return "Weekly Shorts";
+            case FilterType::Rank:
+                return "Rank";
+            case FilterType::TrackOfTheDay:
+                return "TOTD";
         }
 
         throw("Not implemented - FilterType: " + filterType);
@@ -31,13 +40,19 @@ namespace FilterType {
             case 0:
                 return FilterType::Comparison;
             case 1:
-                return FilterType::TimeUnit;
+                return FilterType::Time;
             case 2:
-                return FilterType::Map;
+                return FilterType::MapName;
             case 3:
                 return FilterType::Medal;
             case 4:
-                return FilterType::Campaign;
+                return FilterType::CurrentCampaign;
+            case 5:
+                return FilterType::Rank;
+            case 6:
+                return FilterType::TrackOfTheDay;
+            case 7:
+                return FilterType::WeeklyShorts;
         }
 
         throw("Not implemented - FilterType: " + filterType);

@@ -1,7 +1,7 @@
 class JsonSetting 
 {
 
-    protected Json::Value@ Data;
+    Json::Value@ Data;
 
     JsonSetting(Json::Value@ data) {
         @this.Data = data;

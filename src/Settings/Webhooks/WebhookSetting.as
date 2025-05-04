@@ -15,8 +15,6 @@ class WebhookSetting : JsonSetting {
         set { Data["ClubId"] = value; }
     }
 
-    WebhookFilter@ filter;
-
     WebhookSetting(Json::Value@ data) {
         super(data);
     }
@@ -67,7 +65,7 @@ class WebhookSetting : JsonSetting {
         UI::SeparatorText("Filters");
         if (Data.HasKey("Filters"))
         {
-            if (WebhookFilter(Data["Filters"]).Draw()){
+            if (WebhookSettings::GetFilter(Data["Filters"]).Draw()){
                 Data.Remove("Filters");
             }
         }
@@ -80,7 +78,7 @@ class WebhookSetting : JsonSetting {
     }
 
     void Send(PB@ pb) {
-        if (filter.Solve(pb)) {
+        if (Data.HasKey("Filters") && WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
             Net::HttpRequest@ response = DiscordWebHook(pb).Send();
 
             if (response.ResponseCode() != 204)

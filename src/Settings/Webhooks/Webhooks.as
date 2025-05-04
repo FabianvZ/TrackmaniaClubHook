@@ -1,27 +1,57 @@
-[Setting hidden]
-string settings_webhooks = "[{}]";	
-array<WebhookSetting@> webhooks;
+namespace WebhookSettings {
 
-[SettingsTab name="Discord webhooks" icon="DiscordAlt" order=1]
-void RenderDiscordWebhookSettings(){
+    [Setting hidden]
+    string settings_webhooks = "[{}]";	    
+    Json::Value@ _webhooks;
+    array<WebhookSetting@> webhooks;
 
-    UI::BeginTabBar("DiscordPBMessageSettings", UI::TabBarFlags::FittingPolicyResizeDown);
-    for (uint i = 0; i < webhooks.Length; i++) {
-        if (UI::BeginTabItem(Icons::Trophy + " " + webhooks[i].Name +" " + i))
+    [SettingsTab name="Discord webhooks" icon="DiscordAlt" order=1]
+    void RenderDiscordWebhookSettings() {
+
+        UI::BeginTabBar("DiscordPBMessageSettings", UI::TabBarFlags::FittingPolicyResizeDown);
+        for (uint i = 0; i < webhooks.Length; i++) {
+            if (UI::BeginTabItem(Icons::Trophy + " " + webhooks[i].Name +"##" + i))
+            {
+                if (webhooks[i].Draw()){
+                    webhooks.RemoveAt(i);
+                    _webhooks.Remove(i);
+                }
+                UI::EndTabItem();
+            }   
+        }
+        UI::EndTabBar();
+    
+        UI::Separator();
+        if (UI::Button(Icons::Plus + " Add a webhook"))
         {
-            if (WebhookSetting(webhooks[i]).Draw()){
-                webhooks.RemoveAt(i);
-            }
-            UI::EndTabItem();
-        }   
-    }
-    UI::EndTabBar();
-  
-    UI::Separator();
-    if (UI::Button(Icons::Plus + " Add a webhook"))
-    {
-        webhooks.InsertLast(WebhookSetting(Json::Object()));
+            Json::Value@ newWebhook = Json::Object();
+            _webhooks.Add(newWebhook);
+            webhooks.InsertLast(WebhookSetting(newWebhook));
+        }
+
+        settings_webhooks = Json::Write(_webhooks);
     }
 
-    settings_webhooks = Json::Write(webhooks);
+    WebhookFilter@ GetFilter(Json::Value@ data, const string &in label = "") {
+        switch (uint(data.HasKey("Type")? data["Type"] : FilterType::Time)) {
+            case FilterType::Comparison:
+                return Comparison(data, label);
+            case FilterType::MapName:
+                return MapNameFilter(data, label);
+            case FilterType::Medal:
+                return MedalFilter(data, label);
+            case FilterType::CurrentCampaign:
+                return CurrentCampaignFilter(data, label);
+            case FilterType::WeeklyShorts:
+                return WeeklyShortsFilter(data, label);
+            case FilterType::Rank:
+                return RankFilter(data, label);
+            case FilterType::TrackOfTheDay:
+                return TrackOfTheDayFilter(data, label);
+            default:
+                return TimeFilter(data, label);
+        }
+    } 
+    
+
 }
