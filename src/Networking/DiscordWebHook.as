@@ -15,7 +15,7 @@ class DiscordWebHook : WebRequest
         body["username"] = "Trackmania";
         body["avatar_url"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCHBYTbusq8rivJAHP59YQbUtiqoqpbiPUS2Mdxi_pDgiYqGtttj0sS3EO05JS6Xama2A&usqp=CAU";
         body["flags"] = 4096;
-        body["content"] = "#" + pb.User.Name + "(" + URL::TrackmaniaIOPlayer + pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a " + ((improved)? " new" : "" + " PB ") + Medal::ToDiscordString(pb.Medal) + (improved? " beating " + pb.Losers : "");
+        body["content"] = "#[" + pb.User.Name + "](" + URL::TrackmaniaIOPlayer + pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a " + ((improved)? "new" : "" + " PB ") + Medal::ToDiscordString(pb.Medal) + (improved? " beating " + pb.Losers : "");
 
         body["embeds"] = Json::Array();
         body["embeds"].Add(Json::Object());
@@ -25,7 +25,7 @@ class DiscordWebHook : WebRequest
 
         Json::Value@ fields = Json::Array();
         AddField(fields, "Map", "[" + map.CleansedName + "](" + URL::TrackmaniaIOLeaderboard + map.Uid + ") by [" + map.AuthorName + "](" + URL::TrackmaniaIOPlayer + map.AuthorLogin + ")");
-        AddField(fields, "Time", "[" + (pb.Score == uint(-1) ? "Secret" : Time::Format(pb.Score)) + "]" + (pb.PreviousScore == uint(-1) || pb.Score == uint(-1) ? "" : " (-" + Time::Format(pb.PreviousScore - pb.Score) + ")"), true);
+        AddField(fields, "Time", "" + (pb.Score == uint(-1) ? "Secret" : Time::Format(pb.Score)) + (pb.PreviousScore == uint(-1) || pb.Score == uint(-1) ? "" : " (-" + Time::Format(pb.PreviousScore - pb.Score) + ")"), true);
         AddField(fields, "Rank", "" + pb.WorldPosition, true);
         AddField(fields, "GrindTime", Time::Format(GrindingStats::GetSessionTime()) +  " / " + Time::Format(GrindingStats::GetTotalTime()));
         AddField(fields, "Finishes", GrindingStats::GetSessionFinishes() +  " / " + GrindingStats::GetTotalFinishes(), true);

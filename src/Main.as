@@ -26,30 +26,12 @@ void Main()
         }
     }
 #endif
-    if (clubId == -1)
-    {
-        clubId = Nadeo::LiveServiceRequest("/api/token/club/player/info")["pinnedClub"];
-    }    
-    if (settings_discord_URL == DiscordDefaults::URL)
-    {
-        UI::ShowNotification(
-				"Discord Rivalry Ping",
-				"Discord webhook is not set in settings. This is needed to send leaderboards!",
-				UI::HSV(0.55f, 1.0f, 1.0f), 7500);
-    }
+
     sendPBShortcut.key = togglePBKey;
     forceSendShortcut.key = forceSendKey;
-    @WebhookSettings::_webhooks = Json::Parse(WebhookSettings::settings_webhooks);
-    if (WebhookSettings::_webhooks.GetType() != Json::Type::Array)
-    {
-        @WebhookSettings::_webhooks = Json::Array();
-    }
-    for (uint i = 0; i < WebhookSettings::_webhooks.Length; i++)
-    {
-        Log(Json::Write(WebhookSettings::_webhooks[i]));
-        WebhookSettings::webhooks.InsertLast(@WebhookSetting(WebhookSettings::_webhooks[i]));
-    }
-    migrateOldData();
+    Legacy::migrateOldWebhookSettings();
+    WebhookSettings::Initialize();
+    Legacy::migrateOldGrindingStatsData();
     startnew(PBLoop);
 }
 
@@ -65,10 +47,10 @@ void PBLoop()
     while (true)
     {
 
-        if (reloadclubs)
+        if (WebhookSettings::reloadclubs)
         {
-            clubs = Nadeo::LiveServiceRequest("/api/token/club/mine?length=100&offset=0");
-            reloadclubs = false;
+            WebhookSettings::clubs = Nadeo::LiveServiceRequest("/api/token/club/mine?length=100&offset=0");
+            WebhookSettings::reloadclubs = false;
         }
 
         // Wait until player is on a map
@@ -96,18 +78,8 @@ void PBLoop()
             continue;
         }
 
-        uint currentPB = force_send_pb? force_send_pb_time : GetCurrBestTime(app, map.Uid);
-        force_send_pb = false;
-
-        if (test_position) {
-            test_position = false;
-            test_position_result = GetClubLeaderboardPosition(map.Uid, test_position_time)["position"];
-        }
-
-        if (test_world_position) {
-            test_world_position = false;
-            test_world_position_result = PB(user, map, test_world_position_time, test_world_position_time, previousPosition, previousPosition).WorldPosition;
-        }
+        uint currentPB = Testing::force_send_pb? Testing::force_send_pb_time : GetCurrBestTime(app, map.Uid);
+        Testing::force_send_pb = false;
 
         if (send_pb_manual) {
             send_pb_manual = false;
@@ -198,57 +170,4 @@ MwId GetMainUserId() {
     } else {
         return MwId();
     }
-}
-
-//{"medals":"[{\"medal\":0,\"achieved\":true,\"achieved_time\":\"          0\"},{\"medal\":1,\"achieved\":true,\"achieved_time\":\"          0\"},{\"medal\":2,\"achieved\":true,\"achieved_time\":\"          0\"},{\"medal\":3,\"achieved\":false,\"achieved_time\":\"          0\"},{\"medal\":5,\"achieved\":false,\"achieved_time\":\"          0\"}]","time":"     138230","finishes":"     2","resets":"     5","respawns":"     0"}
-void migrateOldData() {
-	auto old_path = IO::FromStorageFolder("data");
-	if (IO::FolderExists(old_path)) {
-		UI::ShowNotification("Discord Rivalry Ping", "Moving Grinding Stats data to Grinding stats plugin.", UI::HSV(0.10f, 1.0f, 1.0f), 2500);
-		auto new_path = IO::FromDataFolder("PluginStorage/GrindingStats/data");
-		if (IO::FolderExists(new_path)) {
-
-            auto old = IO::IndexFolder(old_path, true);
-            for (uint i = 0; i < old.Length; i++) {
-                const string[] @parts = old[i].Split("/");
-                const string name = new_path + "/" + parts[parts.Length - 1];
-                if (IO::FileExists(name)) {
-                    print("Combining " + old[i] + " and " + name);
-                    Json::Value new_file = Json::FromFile(name);
-                    Json::Value old_file = Json::FromFile(old[i]);
-
-                    new_file["finishes"] = Text::Format("%6d", getValue(new_file["finishes"]) + getValue(old_file["finishes"]));
-                    new_file["resets"] = Text::Format("%6d", getValue(new_file["resets"]) + getValue(old_file["resets"]));
-                    new_file["time"] = Text::Format("%11d", getValue(new_file["time"]) + getValue(old_file["time"]));
-                    new_file["respawns"] = Text::Format("%6d", getValue(new_file["respawns"]) + getValue(old_file["respawns"]));
-
-                    Json::ToFile(name, new_file);
-                    IO::Delete(old[i]);
-                } 
-                else {
-                    print("moving " + old[i] + " to " + name);
-                    IO::Move(old[i], name);
-                }
-            }
-            UI::ShowNotification("Discord Rivalry Ping", "Completed Data Transfer", UI::HSV(0.35f, 1.0f, 1.0f), 10000);
-            IO::DeleteFolder(old_path);
-		} else {
-            IO::Move(old_path, new_path);
-            if (IO::IndexFolder(old_path, true).Length == 0) {
-                IO::DeleteFolder(old_path);
-            }
-        }
-	}
-}
-
-int getValue(Json::Value value) 
-{
-    switch (value.GetType())
-    {
-        case Json::Type::String:
-            return Text::ParseUInt64(value);
-        case Json::Type::Number:
-            return value;
-    }
-    return 0;
 }

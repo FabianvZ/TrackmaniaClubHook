@@ -39,11 +39,11 @@ class Shortcut {
     void RenderUI() {  // Pass the setting as reference
         UI::Text("Shortcut to " + notificationMessage + ": " + ((key != 0) ? tostring(key) : "None"));
         UI::SameLine();
-        if (UI::Button("Change " + notificationMessage)) {
+        if (UI::Button("Change")) {
             record = true;
         }
         UI::SameLine();
-        if (UI::Button("Clear " + notificationMessage)) {
+        if (UI::Button("Clear")) {
             key = VirtualKey(0);
         }
     }

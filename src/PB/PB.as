@@ -3,7 +3,7 @@ class PB
     Map@ Map;
     User@ User;
     Medal Medal;
-    uint PreviousScore, Score, PreviousClubPosition, ClubPosition, WorldPosition, ContinentPosition, CountryPosition, ProvincePosition;
+    uint PreviousScore, _score, Score, PreviousClubPosition, ClubPosition, WorldPosition, ContinentPosition, CountryPosition, ProvincePosition;
     array<string> LeaderboardFragments;
     string Losers = "";
 
@@ -16,6 +16,7 @@ class PB
         SetPBPosition(map.Uid, score);
         Medal = GetReachedMedal(Map, score);
         PreviousScore = previousScore;
+        _score = score;
         Score = (score <= Map.AuthorMedalTime && Campaign::WeeklyShorts.IsCurrentCampaignMap(map)) ? -1 : score;
         BuildLeaderboard();
     }

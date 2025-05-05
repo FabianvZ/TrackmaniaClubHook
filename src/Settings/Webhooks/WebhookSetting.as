@@ -25,31 +25,27 @@ class WebhookSetting : JsonSetting {
             return true;
         }
 
-        UI::Text("Name");
         Name = UI::InputText("Name", Name);
-
-        UI::Text("Url");
         WebhookUrl = UI::InputText("WebhookUrl", WebhookUrl);
 
-        UI::Text("Club");
         string currentClub;
-        for (uint i = 0; clubs.HasKey("clubList") &&  i < clubs["clubList"].Length; i++)
+        for (uint i = 0; WebhookSettings::clubs.HasKey("clubList") &&  i < WebhookSettings::clubs["clubList"].Length; i++)
         {
-            if (clubs["clubList"][i]["id"] == ClubId)
+            if (WebhookSettings::clubs["clubList"][i]["id"] == ClubId)
             {
-                string clubname = clubs["clubList"][i]["name"];
-                int clubID = clubs["clubList"][i]["id"];
+                string clubname = WebhookSettings::clubs["clubList"][i]["name"];
+                int clubID = WebhookSettings::clubs["clubList"][i]["id"];
                 currentClub = clubname + " (ClubId: " + clubID + ")";
             }
         }
-        if (UI::BeginCombo("##ClubComboBox", currentClub))
+        if (UI::BeginCombo("Club##ClubComboBox", currentClub))
         {
-            for (uint i = 0; clubs.HasKey("clubList") && i < clubs["clubList"].Length; i++)
+            for (uint i = 0; WebhookSettings::clubs.HasKey("clubList") && i < WebhookSettings::clubs["clubList"].Length; i++)
             {
-                string clubName = clubs["clubList"][i]["name"];
-                int clubID = clubs["clubList"][i]["id"];
+                string clubName = WebhookSettings::clubs["clubList"][i]["name"];
+                int clubID = WebhookSettings::clubs["clubList"][i]["id"];
                 if (UI::Selectable( clubName + " (ClubId: " + clubID + ")", 
-                                clubs["clubList"][i]["id"] == clubId))
+                                WebhookSettings::clubs["clubList"][i]["id"] == clubId))
                 {
                     ClubId = clubID;
                 }
@@ -59,7 +55,7 @@ class WebhookSetting : JsonSetting {
         UI::SameLine();
         if (UI::Button("Reload clubs")) 
         {
-            reloadclubs = true;
+            WebhookSettings::reloadclubs = true;
         }
 
         UI::SeparatorText("Filters");

@@ -12,6 +12,12 @@ class MedalFilter : OrdinalWebhookFilter {
     void DrawOrdinalValue() override {
         UI::SetNextItemWidth(120.0f);
         if (UI::BeginCombo("##Medal" + label, Medal::ToString(Medal))) {
+#if DEPENDENCY_CHAMPIONMEDALS
+            if (UI::Selectable(Medal::ToString(Medal::Champion), Medal == Medal::Champion))
+            {
+                Medal = Medal::Champion;
+            } else
+#endif
             if (UI::Selectable(Medal::ToString(Medal::Author), Medal == Medal::Author))
             {
                 Medal = Medal::Author;

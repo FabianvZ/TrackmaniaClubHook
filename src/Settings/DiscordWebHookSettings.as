@@ -1,51 +1,103 @@
-[SettingsTab name="Discord" icon="DiscordAlt" order=0]
+[Setting hidden]
+bool settings_SendPB = true;
+
+[Setting hidden]
+string settings_discord_user_id = DiscordDefaults::UserId;
+
+[Setting hidden]
+bool settings_inline_columns = false;
+
+[Setting hidden]
+bool settings_AdvancedDiscordSettings = false;
+
+[Setting hidden]
+string settings_no_medal_string = DiscordDefaults::NoMedal;
+
+[Setting hidden]
+string settings_bronze_medal_string = DiscordDefaults::BronzeMedal;
+
+[Setting hidden]
+string settings_silver_medal_string = DiscordDefaults::SilverMedal;
+
+[Setting hidden]
+string settings_gold_medal_string = DiscordDefaults::GoldMedal;
+
+[Setting hidden]
+string settings_at_medal_string = DiscordDefaults::AuthorMedal;
+
+[Setting hidden]
+string settings_champion_medal_string = DiscordDefaults::ChampionMedal;
+
+[Setting hidden]
+string settings_usernames = DiscordDefaults::usernames;
+
+bool showImportPopup = false;
+string import_settings_usernames = "";
+string import_error_message = "";
+
+[SettingsTab name="General" icon="Cog" order=0]
 void RenderDiscordSettings()
 {
     RenderResetButton();
 
-    settings_discord_URL = UI::InputText("Discord WebHook-URL", settings_discord_URL);
+    settings_SendPB = UI::Checkbox("Send PB to Discord", settings_SendPB);
+    UI::SetTooltip("Enable to send PBs to Discord. You can set a shortcut for this in the settings tab.");
     settings_inline_columns = UI::Checkbox("Inline columns in webhook", settings_inline_columns);
+    UI::SetTooltip("Enable to show show splitted leaderboards next to each other in the webhook. A leaderboard will split at around 30 entries depending on the length of the longest name. If not enabled the leaderboard fragments will be displayed below each other.");
 
-    sendPBShortcut.RenderUI();
-    forceSendShortcut.RenderUI();
-    
 #if !DEPENDENCY_DISCORD
     settings_discord_user_id = UI::InputText("Discord User-ID", settings_discord_user_id);
 #endif
 
-    UI::SetNextItemWidth(300);
-    UI::Text("Trackmania username");
-    UI::SameLine();
-    UI::SetNextItemWidth(200);
-    UI::Text("Discord user ID");
+    UI::SeparatorText("Shortcuts");
+    sendPBShortcut.RenderUI();
+    forceSendShortcut.RenderUI();
 
-    array<string> parts = settings_usernames.Split("\n");
-    for (uint i = 0; i < parts.Length; i++)
-    {
-        array<string> nameParts = parts[i].Split(";");
+    UI::SeparatorText("Discord ping settings");    
+    UI::Text("You can set up a list of Trackmania usernames and Discord user IDs to ping them when you send a message.");
 
-        UI::SetNextItemWidth(300);
-        parts[i] = UI::InputText("##TrackmaniaUsername" + i, nameParts.Length > 0 ? nameParts[0] : "") + ";";
-        UI::SameLine();
+    if (UI::BeginTable("Keybinds", 3, UI::TableFlags::BordersV | UI::TableFlags::BordersH | UI::TableFlags::NoHostExtendX)) {
+        UI::TableSetupColumn("Trackmania username", UI::TableColumnFlags::WidthFixed);
+        UI::TableSetupColumn("Discord user ID", UI::TableColumnFlags::WidthFixed);
+        UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed);
+        UI::TableHeadersRow();
 
-        UI::SetNextItemWidth(200);
-        parts[i] += UI::InputText("##DiscordID" + i, nameParts.Length > 1 ? nameParts[1] : "");
-            
-        UI::SameLine();
-        if (UI::ButtonColored(Icons::Trash + "##" + i, 0.0f)) {
-            parts.RemoveAt(i);
-            i--;
+        array<string> parts = settings_usernames.Split("\n");
+
+        for (uint i = 0; i < parts.Length; i++) {
+            array<string> nameParts = parts[i].Split(";");
+            UI::TableNextRow();
+
+            UI::TableNextColumn();
+            UI::SetNextItemWidth(200);
+            parts[i] = UI::InputText("##TrackmaniaUsername" + i, nameParts.Length > 0 ? nameParts[0] : "") + ";";
+
+            UI::TableNextColumn();
+            UI::SetNextItemWidth(150);
+            parts[i] += UI::InputText("##DiscordID" + i, nameParts.Length > 1 ? nameParts[1] : "", UI::InputTextFlags::CharsDecimal);
+
+            UI::TableNextColumn();
+            if (UI::ButtonColored(Icons::Trash + "##" + i, 0.0f)) {
+                parts.RemoveAt(i);
+                i--;
+            }
         }
-    }
-    settings_usernames = string::Join(parts, "\n");
 
-    UI::SetNextItemWidth(300);
-    string newTrackmaniaUsername = UI::InputText("##TrackmaniaUsername" + parts.Length, "");
-    UI::SameLine();
-    UI::SetNextItemWidth(200);
-    string newDiscordID = UI::InputText("##DiscordID" + parts.Length, "");
-    if (newTrackmaniaUsername.Length > 0 || newDiscordID.Length > 0) {
-        settings_usernames += "\n" + newTrackmaniaUsername + ";" + newDiscordID;
+        UI::TableNextRow();
+        UI::TableNextColumn();
+        UI::SetNextItemWidth(200);
+        string newTrackmaniaUsername = UI::InputText("##TrackmaniaUsername" + parts.Length, "");
+
+        UI::TableNextColumn();            
+        UI::SetNextItemWidth(150);
+        string newDiscordID = UI::InputText("##DiscordID" + parts.Length, "", UI::InputTextFlags::CharsDecimal);
+
+        settings_usernames = string::Join(parts, "\n");
+        if (newTrackmaniaUsername.Length > 0 || newDiscordID.Length > 0) {
+            settings_usernames += "\n" + newTrackmaniaUsername + ";" + newDiscordID;
+        }
+
+        UI::EndTable();
     }
 
     if (UI::Button(Icons::Clipboard	 + " export discord ping settings"))
@@ -78,14 +130,9 @@ void RenderDiscordSettings()
         }
 
         UI::End();
-    }
+    }   
 
-#if SIG_DEVELOPER
     settings_AdvancedDiscordSettings = UI::Checkbox("Advanced Settings", settings_AdvancedDiscordSettings);
-#else
-    if (settings_AdvancedDiscordSettings)
-        settings_AdvancedDiscordSettings = UI::Checkbox("Advanced Settings", settings_AdvancedDiscordSettings);
-#endif
 
     if (!settings_AdvancedDiscordSettings) return;
 

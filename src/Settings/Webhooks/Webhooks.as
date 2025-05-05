@@ -5,6 +5,9 @@ namespace WebhookSettings {
     Json::Value@ _webhooks;
     array<WebhookSetting@> webhooks;
 
+    Json::Value clubs = Json::Object();
+    bool reloadclubs = true;
+
     [SettingsTab name="Discord webhooks" icon="DiscordAlt" order=1]
     void RenderDiscordWebhookSettings() {
 
@@ -53,5 +56,17 @@ namespace WebhookSettings {
         }
     } 
     
+    void Initialize() {
+        _webhooks = Json::Parse(settings_webhooks);
+        if (_webhooks.GetType() != Json::Type::Array)
+        {
+            @_webhooks = Json::Array();
+        }
+        for (uint i = 0; i < _webhooks.Length; i++)
+        {
+            Log(Json::Write(_webhooks[i]));
+            webhooks.InsertLast(@WebhookSetting(_webhooks[i]));
+        }
+    }
 
 }

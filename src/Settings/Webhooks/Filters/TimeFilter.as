@@ -33,11 +33,11 @@ class TimeFilter : OrdinalWebhookFilter {
 
     int GetValue(PB@ pb) override {
         if (timeUnit == TimeUnit::Milliseconds) {
-            return pb.Score;
+            return pb._score;
         } else if (timeUnit == TimeUnit::Seconds) {
-            return pb.Score / 1000;
+            return pb._score / 1000;
         } else if (timeUnit == TimeUnit::Minutes) {
-            return pb.Score / 60000;
+            return pb._score / 60000;
         }
         return 0;
     }

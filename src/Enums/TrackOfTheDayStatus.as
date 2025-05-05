@@ -8,9 +8,9 @@ namespace TotDStatus {
     string ToString(TotDStatus status) {
         switch (status) {
             case TotDStatus::Is:
-                return "Is";
+                return "Is the map";
             case TotDStatus::IsNot:
-                return "Is Not";
+                return "Is not the map";
         }
 
         throw("Not implemented - TotDStatus: " + status);
