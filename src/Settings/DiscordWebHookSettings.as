@@ -160,10 +160,8 @@ void RenderResetButton()
     if (UI::ButtonColored("Reset to default", 0.0f))
     {
         settings_discord_user_id = DiscordDefaults::UserId;
-        settings_discord_URL = DiscordDefaults::URL;
         settings_SendPB = true;
         settings_AdvancedDiscordSettings = false;
-        settings_filter_string = "";
         settings_no_medal_string = DiscordDefaults::NoMedal;
         settings_bronze_medal_string = DiscordDefaults::BronzeMedal;
         settings_silver_medal_string = DiscordDefaults::SilverMedal;
@@ -171,7 +169,6 @@ void RenderResetButton()
         settings_at_medal_string = DiscordDefaults::AuthorMedal;
         settings_champion_medal_string = DiscordDefaults::ChampionMedal;
         settings_usernames = DiscordDefaults::usernames;
-        reloadclubs = true;
     }
 }
 

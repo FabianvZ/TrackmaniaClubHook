@@ -1,9 +1,9 @@
 class DiscordWebHook : WebRequest
 {
 
-    DiscordWebHook(PB@ pb)
+    DiscordWebHook(PB@ pb, string discordURL)
     {
-        super(Net::HttpMethod::Post, settings_discord_URL, Json::Parse(DiscordDefaults::Header), GetInterpolatedBody(pb), true, true);
+        super(Net::HttpMethod::Post, discordURL, Json::Parse(DiscordDefaults::Header), GetInterpolatedBody(pb), true, true);
     }
 
     string GetInterpolatedBody(PB@ pb)

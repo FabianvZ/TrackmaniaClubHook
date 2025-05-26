@@ -57,7 +57,8 @@ namespace WebhookSettings {
     } 
     
     void Initialize() {
-        _webhooks = Json::Parse(settings_webhooks);
+        Log(settings_webhooks);
+        @_webhooks = Json::Parse(settings_webhooks);
         if (_webhooks.GetType() != Json::Type::Array)
         {
             @_webhooks = Json::Array();

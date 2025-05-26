@@ -3,11 +3,11 @@ class PB
     Map@ Map;
     User@ User;
     Medal Medal;
-    uint PreviousScore, _score, Score, PreviousClubPosition, ClubPosition, WorldPosition, ContinentPosition, CountryPosition, ProvincePosition;
+    uint PreviousScore, _score, Score, PreviousClubPosition, ClubPosition, WorldPosition, ContinentPosition, CountryPosition, ProvincePosition, ClubId;
     array<string> LeaderboardFragments;
     string Losers = "";
 
-    PB(User@ user, Map@ map, uint previousScore, uint score, uint previousPosition, uint position)
+    PB(User@ user, Map@ map, uint previousScore, uint score, uint previousPosition, uint position, uint clubId)
     {
         @User = user;
         @Map = map;
@@ -17,6 +17,7 @@ class PB
         Medal = GetReachedMedal(Map, score);
         PreviousScore = previousScore;
         _score = score;
+        ClubId = clubId;
         Score = (score <= Map.AuthorMedalTime && Campaign::WeeklyShorts.IsCurrentCampaignMap(map)) ? -1 : score;
         BuildLeaderboard();
     }
@@ -39,7 +40,7 @@ class PB
 
     private void BuildLeaderboard()
     {
-        Json::Value leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + Map.Uid + "/club/" + clubId + "/top?length=100&offset=0")["top"];
+        Json::Value leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + Map.Uid + "/club/" + ClubId + "/top?length=100&offset=0")["top"];
         Log(Json::Write(leaderboard));
         int position = 0;
         int maxUsernameLength = 0;

@@ -1,7 +1,7 @@
 class WebhookSetting : JsonSetting {
 
     string WebhookUrl {
-        get { return Data.HasKey("WebhookUrl")? Data["WebhookUrl"] : settings_discord_URL; }
+        get { return Data.HasKey("WebhookUrl")? Data["WebhookUrl"] : DiscordDefaults::URL; }
         set { Data["WebhookUrl"] = value; }
     }
 
@@ -11,9 +11,11 @@ class WebhookSetting : JsonSetting {
     }
 
     int ClubId {
-        get { return Data.HasKey("ClubId")? Data["ClubId"] : clubId; }
+        get { return Data.HasKey("ClubId")? Data["ClubId"] : Legacy::clubId; }
         set { Data["ClubId"] = value; }
     }
+
+    uint previousPosition;
 
     WebhookSetting(Json::Value@ data) {
         super(data);
@@ -45,7 +47,7 @@ class WebhookSetting : JsonSetting {
                 string clubName = WebhookSettings::clubs["clubList"][i]["name"];
                 int clubID = WebhookSettings::clubs["clubList"][i]["id"];
                 if (UI::Selectable( clubName + " (ClubId: " + clubID + ")", 
-                                WebhookSettings::clubs["clubList"][i]["id"] == clubId))
+                                WebhookSettings::clubs["clubList"][i]["id"] == ClubId))
                 {
                     ClubId = clubID;
                 }
@@ -73,27 +75,63 @@ class WebhookSetting : JsonSetting {
         return false;
     }
 
-    void Send(PB@ pb) {
-        if (Data.HasKey("Filters") && WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
-            Net::HttpRequest@ response = DiscordWebHook(pb).Send();
+    void UpdatePosition(Map@ map, uint score) {
+        previousPosition = GetClubLeaderboardPosition(map.Uid, score)["position"];
+    }
 
-            if (response.ResponseCode() != 204)
-            {
-                UI::ShowNotification(
-                        "Discord Rivalry Ping",
-                        "Sending to discord webhook failed.",
-                        UI::HSV(0.10f, 1.0f, 1.0f), 7500);
-                error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
-                Log(response.Body);
-                Log("Length: " + response.Body.Length);
-                Log(response.Error());
-                Log(response.String());
-            }
-            else
-            {
-                Log("Sent " + Name + " to Discord");
+    void Send(User@ user, Map@ map, uint previousScore, uint currentScore) {
+        uint position;
+        Json::Value@ positionRequest = GetClubLeaderboardPosition(map.Uid, previousScore);
+        if (uint(positionRequest["score"]) == previousScore) {
+            previousPosition = positionRequest["position"];
+            position = GetClubLeaderboardPosition(map.Uid, currentScore)["position"];
+        } else {
+            position = positionRequest["position"];
+        }
+
+        Log("Club " + Name + " Position: " + previousPosition + " -> " + position);
+        if (position < previousPosition) {
+
+            PB @pb = PB(user, map, previousScore, currentScore, previousPosition, position, ClubId);
+            if (Data.HasKey("Filters") && WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
+                Send(pb);
             }
         }
+        previousPosition = position;
+    }
+
+    void Send(PB@ pb) {
+        Net::HttpRequest@ response = DiscordWebHook(pb, WebhookUrl).Send();
+
+        if (response.ResponseCode() != 204)
+        {
+            UI::ShowNotification(
+                    "Discord Rivalry Ping",
+                    "Sending to discord webhook failed.",
+                    UI::HSV(0.10f, 1.0f, 1.0f), 7500);
+            error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
+            Log(response.Body);
+            Log("Length: " + response.Body.Length);
+            Log(response.Error());
+            Log(response.String());
+        }
+        else
+        {
+            Log("Sent " + Name + " to Discord");
+        }
+    }
+
+    Json::Value@ GetClubLeaderboardPosition(const string &in mapUid, uint score) 
+    {
+        Json::Value@ requestbody = Json::Object();
+        requestbody["maps"] = Json::Array();
+        Json::Value mapJson = Json::Object();
+        mapJson["mapUid"] = mapUid;
+        mapJson["groupUid"] = "Personal_Best";
+        requestbody["maps"].Add(mapJson);
+        Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map/club/" + ClubId + "?scores[" + mapUid +  "]=" + score, requestbody)[0];
+        Log(Json::Write(personalBest));
+        return personalBest;
     }
 
 }
