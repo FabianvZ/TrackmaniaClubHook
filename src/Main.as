@@ -26,12 +26,12 @@ void Main()
         }
     }
 #endif
+    Legacy::migrateOldWebhookSettings();
+    Legacy::migrateOldGrindingStatsData();
 
     sendPBShortcut.key = togglePBKey;
     forceSendShortcut.key = forceSendKey;
-    Legacy::migrateOldWebhookSettings();
     WebhookSettings::Initialize();
-    Legacy::migrateOldGrindingStatsData();
     startnew(PBLoop);
 }
 

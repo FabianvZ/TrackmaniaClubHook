@@ -25,14 +25,20 @@ class Comparison : WebhookFilter {
     }
 
     bool Draw() override {
-        UI::Indent();
+        if (Comparison == Comparisons::Or) {
+            UI::Indent();
+        }
         if (FirstFilter.Draw()) {
             RevertToFilter(SecondFilter);
-            UI::Unindent();
+            if (Comparison == Comparisons::Or) {
+                UI::Unindent();
+            }
             return false;
         }  
         
-        UI::Unindent();
+        if (Comparison == Comparisons::Or) {
+            UI::Unindent();
+        }
         UI::SetNextItemWidth(60.0f);
         if (UI::BeginCombo("##Comparison" + label, Comparisons::ToString(Comparison))) {
             if (UI::Selectable(Comparisons::ToString(Comparisons::And), Comparison == Comparisons::And))
@@ -45,11 +51,15 @@ class Comparison : WebhookFilter {
             UI::EndCombo();
         }
 
-        UI::Indent();
+        if (Comparison == Comparisons::Or) {
+            UI::Indent();
+        }
         if (SecondFilter.Draw()) {
             RevertToFilter(FirstFilter);
         }
-        UI::Unindent();
+        if (Comparison == Comparisons::Or) {
+            UI::Unindent();
+        }
         return false;
     }
 

@@ -9,7 +9,10 @@ namespace Testing {
         UI::Text("Test the plugin by sending a score with a given time.");
         force_send_pb_time = UI::InputInt("Time", force_send_pb_time);
         UI::SameLine();
-        force_send_pb = UI::Button("Send PB");
+        if (UI::Button("Send PB")){
+            force_send_pb = true;
+        }
+        UI::InputTextMultiline("Webhooks", WebhookSettings::settings_webhooks);
     }
 #endif
 

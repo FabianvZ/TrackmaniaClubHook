@@ -93,7 +93,7 @@ class WebhookSetting : JsonSetting {
         if (position < previousPosition) {
 
             PB @pb = PB(user, map, previousScore, currentScore, previousPosition, position, ClubId);
-            if (Data.HasKey("Filters") && WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
+            if (!Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
                 Send(pb);
             }
         }

@@ -17,16 +17,46 @@ namespace Legacy {
       data["ClubId"] = clubId;
 
       if (settings_filter_string != "") {
-        Json::Value@ filter = Json::Object();
-        
+        // Medal,>=,0,and;Time,>=,0,and;Rank,>=,0,or;Medal,>=,4,and;Medal,>=,2,or;Medal,>=,4,and;
+        array<string> rawParts = settings_filter_string.Split(";");
+        for (int i = 0; i < rawParts.Length - 1; i++) {
+          Log(rawParts[i]);
+          Json::Value@ filter = Json::Object();
+          array<string> parts = rawParts[i].Split(",");
+
+          if (parts[0] == "Medal") {
+            filter["Type"] = FilterType::Medal;
+          } else if (parts[0] == "Time") {
+            filter["Type"] = FilterType::Time;
+          } else if (parts[0] == "Rank") {
+            filter["Type"] = FilterType::Rank;
+          } 
+
+          if (parts[1] == ">=") {
+            filter["Comparison"] = OrdinalComparisons::GreaterThanOrEqual;
+          } else if (parts[1] == "<=") {
+            filter["Comparison"] = OrdinalComparisons::LessThanOrEqual;
+          } else if (parts[1] == ">") {
+            filter["Comparison"] = OrdinalComparisons::GreaterThan;
+          } else if (parts[1] == "<") {
+            filter["Comparison"] = OrdinalComparisons::LessThan;
+          } else if (parts[1] == "==") {
+            filter["Comparison"] = OrdinalComparisons::Equal;
+          }
+
+          filter["Value"] = Text::ParseInt(parts[2]);
+          data["Filters"] = filter;
+        }
       }
+
+      Json::Value@ filters = Json::Array();
+      filters.Add(data);
+      WebhookSettings::settings_webhooks = Json::Write(filters);
 
       // TODO uncomment this when the migration is ready
       // settings_discord_URL = DiscordDefaults::URL;
       // clubId = -1;
       // settings_filter_string = "";
-
-
     }
   }
 
