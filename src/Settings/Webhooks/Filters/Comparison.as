@@ -75,7 +75,7 @@ class Comparison : WebhookFilter {
         }
     }
 
-    bool Solve(PB@ pb) override {
+    bool Solve(ClubPB@ pb) override {
         if (Comparison == Comparisons::And)
         {
             return FirstFilter.Solve(pb) && SecondFilter.Solve(pb);

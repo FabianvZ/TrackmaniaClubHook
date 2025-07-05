@@ -92,7 +92,7 @@ class WebhookSetting : JsonSetting {
         Log("Club " + Name + " Position: " + previousPosition + " -> " + position);
         if (position < previousPosition) {
 
-            PB @pb = PB(user, map, previousScore, currentScore, previousPosition, position, ClubId);
+            ClubPB @pb = ClubPB(PB(user, map, previousScore, currentScore), previousPosition, position, ClubId);
             if (!Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
                 Send(pb);
             }
@@ -100,7 +100,7 @@ class WebhookSetting : JsonSetting {
         previousPosition = position;
     }
 
-    void Send(PB@ pb) {
+    void Send(ClubPB@ pb) {
         Net::HttpRequest@ response = DiscordWebHook(pb, WebhookUrl).Send();
 
         if (response.ResponseCode() != 204)

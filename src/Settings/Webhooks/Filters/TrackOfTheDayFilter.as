@@ -23,8 +23,8 @@ class TrackOfTheDayFilter : WebhookFilterElement {
         }
     } 
 
-    bool Solve(PB@ pb) override {
-        return (TotDStatus == TotDStatus::Is) == TrackOfTheDay::IsTrackOfTheDay(pb.Map);
+    bool Solve(ClubPB@ pb) override {
+        return (TotDStatus == TotDStatus::Is) == TrackOfTheDay::IsTrackOfTheDay(pb.pb.Map);
     }
 
 }

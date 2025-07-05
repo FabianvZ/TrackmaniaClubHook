@@ -15,6 +15,7 @@ namespace Campaign {
         {
             if (_campaign is null || uint(_campaign["endTimestamp"]) < Time::get_Now())
             {
+                Log("Campaign is null or has ended, fetching new campaign data for " + _uri);
                 @_campaign = Nadeo::LiveServiceRequest("/api/campaign/" + _uri + "?length=1&offset=0")["campaignList"][0];
             }
             for (uint i = 0; i < _campaign["playlist"].Length; i++)

@@ -28,8 +28,8 @@ class CampaignFilter : WebhookFilterElement {
         UI::Text("Map");
     } 
 
-    bool Solve(PB@ pb) override {
-        return (CampaignFilters == CampaignFilters::Contains) == Campaign.IsCurrentCampaignMap(pb.Map);
+    bool Solve(ClubPB@ pb) override {
+        return (CampaignFilters == CampaignFilters::Contains) == Campaign.IsCurrentCampaignMap(pb.pb.Map);
     }
 
 }

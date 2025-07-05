@@ -38,15 +38,15 @@ class MapNameFilter : WebhookFilterElement {
         Map = UI::InputText("##" + label, Map);
     }
 
-    bool Solve(PB@ pb) override {
+    bool Solve(ClubPB@ pb) override {
         if (MapFilters == StringComparisons::Contains) {
-            return pb.Map.Name.Contains(Map);
+            return pb.pb.Map.Name.Contains(Map);
         } else if (MapFilters == StringComparisons::DoesNotContain) {
-            return !pb.Map.Name.Contains(Map);
+            return !pb.pb.Map.Name.Contains(Map);
         } else if (MapFilters == StringComparisons::Is) {
-            return pb.Map.Name == Map;
+            return pb.pb.Map.Name == Map;
         } else if (MapFilters == StringComparisons::IsNot) {
-            return pb.Map.Name != Map;
+            return pb.pb.Map.Name != Map;
         }
         return false;
     }

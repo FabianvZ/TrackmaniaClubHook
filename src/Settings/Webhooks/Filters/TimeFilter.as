@@ -31,13 +31,13 @@ class TimeFilter : OrdinalWebhookFilter {
         }
     }
 
-    int GetValue(PB@ pb) override {
+    int GetValue(ClubPB@ pb) override {
         if (timeUnit == TimeUnit::Milliseconds) {
-            return pb._score;
+            return pb.pb._score;
         } else if (timeUnit == TimeUnit::Seconds) {
-            return pb._score / 1000;
+            return pb.pb._score / 1000;
         } else if (timeUnit == TimeUnit::Minutes) {
-            return pb._score / 60000;
+            return pb.pb._score / 60000;
         }
         return 0;
     }

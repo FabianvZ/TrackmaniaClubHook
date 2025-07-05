@@ -17,10 +17,11 @@ namespace Legacy {
       data["ClubId"] = clubId;
 
       if (settings_filter_string != "") {
-        // Medal,>=,0,and;Time,>=,0,and;Rank,>=,0,or;Medal,>=,4,and;Medal,>=,2,or;Medal,>=,4,and;
         array<string> rawParts = settings_filter_string.Split(";");
+        Json::Value@ filters;
+        Json::Value@ currentGroup;
+
         for (int i = 0; i < rawParts.Length - 1; i++) {
-          Log(rawParts[i]);
           Json::Value@ filter = Json::Object();
           array<string> parts = rawParts[i].Split(",");
 
@@ -33,20 +34,42 @@ namespace Legacy {
           } 
 
           if (parts[1] == ">=") {
-            filter["Comparison"] = OrdinalComparisons::GreaterThanOrEqual;
+            filter["OrdinalComparison"] = OrdinalComparisons::GreaterThanOrEqual;
           } else if (parts[1] == "<=") {
-            filter["Comparison"] = OrdinalComparisons::LessThanOrEqual;
+            filter["OrdinalComparison"] = OrdinalComparisons::LessThanOrEqual;
           } else if (parts[1] == ">") {
-            filter["Comparison"] = OrdinalComparisons::GreaterThan;
+            filter["OrdinalComparison"] = OrdinalComparisons::GreaterThan;
           } else if (parts[1] == "<") {
-            filter["Comparison"] = OrdinalComparisons::LessThan;
+            filter["OrdinalComparison"] = OrdinalComparisons::LessThan;
           } else if (parts[1] == "==") {
-            filter["Comparison"] = OrdinalComparisons::Equal;
+            filter["OrdinalComparison"] = OrdinalComparisons::Equal;
           }
 
           filter["Value"] = Text::ParseInt(parts[2]);
-          data["Filters"] = filter;
+          if (currentGroup == null) {
+            @currentGroup = filter;
+          } else {
+            @currentGroup = createComparison(currentGroup, filter, Comparisons::And);
+          }
+
+          if (parts[3] == "or") {
+            if (filters is null) {
+              @filters = currentGroup;
+            } else {
+              @filters = createComparison(currentGroup, filters, Comparisons::Or);
+            }
+            @currentGroup = null;
+          }
         }
+
+        if (currentGroup !is null) {
+          if (filters is null) {
+            @filters = currentGroup;
+          } else {
+            @filters = createComparison(currentGroup, filters, Comparisons::Or);
+          }
+        }
+        data["Filters"] = filters;
       }
 
       Json::Value@ filters = Json::Array();
@@ -60,56 +83,13 @@ namespace Legacy {
     }
   }
 
-  void migrateOldGrindingStatsData() {
-    auto old_path = IO::FromStorageFolder("data");
-    if (IO::FolderExists(old_path)) {
-      UI::ShowNotification("Discord Rivalry Ping", "Moving Grinding Stats data to Grinding stats plugin.", UI::HSV(0.10f, 1.0f, 1.0f), 2500);
-      auto new_path = IO::FromDataFolder("PluginStorage/GrindingStats/data");
-      if (IO::FolderExists(new_path)) {
-
-              auto old = IO::IndexFolder(old_path, true);
-              for (uint i = 0; i < old.Length; i++) {
-                  const string[] @parts = old[i].Split("/");
-                  const string name = new_path + "/" + parts[parts.Length - 1];
-                  if (IO::FileExists(name)) {
-                      print("Combining " + old[i] + " and " + name);
-                      Json::Value new_file = Json::FromFile(name);
-                      Json::Value old_file = Json::FromFile(old[i]);
-
-                      new_file["finishes"] = Text::Format("%6d", getValue(new_file["finishes"]) + getValue(old_file["finishes"]));
-                      new_file["resets"] = Text::Format("%6d", getValue(new_file["resets"]) + getValue(old_file["resets"]));
-                      new_file["time"] = Text::Format("%11d", getValue(new_file["time"]) + getValue(old_file["time"]));
-                      new_file["respawns"] = Text::Format("%6d", getValue(new_file["respawns"]) + getValue(old_file["respawns"]));
-
-                      Json::ToFile(name, new_file);
-                      IO::Delete(old[i]);
-                  } 
-                  else {
-                      print("moving " + old[i] + " to " + name);
-                      IO::Move(old[i], name);
-                  }
-              }
-              UI::ShowNotification("Discord Rivalry Ping", "Completed Data Transfer", UI::HSV(0.35f, 1.0f, 1.0f), 10000);
-              IO::DeleteFolder(old_path);
-      } else {
-              IO::Move(old_path, new_path);
-              if (IO::IndexFolder(old_path, true).Length == 0) {
-                  IO::DeleteFolder(old_path);
-              }
-          }
-    }
-  }
-
-  int getValue(Json::Value value) 
-  {
-      switch (value.GetType())
-      {
-          case Json::Type::String:
-              return Text::ParseUInt64(value);
-          case Json::Type::Number:
-              return value;
-      }
-      return 0;
+  Json::Value@ createComparison(Json::Value@ first, Json::Value@ second, Comparisons comparison) {
+    Json::Value@ comparisonData = Json::Object();
+    comparisonData["Type"] = FilterType::Comparison;
+    comparisonData["Comparison"] = comparison;
+    comparisonData["FirstFilter"] = first;
+    comparisonData["SecondFilter"] = second;
+    return comparisonData;
   }
 
 }

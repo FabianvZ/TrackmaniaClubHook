@@ -1,7 +1,7 @@
 class RankFilter : OrdinalWebhookFilter {
 
     RankZones RankZone {
-        get { return Data.HasKey("RankZone")? RankZones::FromValue(Data["RankZone"]) : RankZones::Club; }
+        get { return Data.HasKey("RankZone")? RankZones::FromValue(Data["RankZone"]) : RankZones::World; }
         set { Data["RankZone"] = value; }
     }
 
@@ -43,17 +43,17 @@ class RankFilter : OrdinalWebhookFilter {
         UI::Text("Leaderboard");
     }
 
-    int GetValue(PB@ pb) override {
+    int GetValue(ClubPB@ pb) override {
         if (RankZone == RankZones::Club) {
             return pb.ClubPosition;
         } else if (RankZone == RankZones::World) {
-            return pb.WorldPosition;
+            return pb.pb.WorldPosition;
         } else if (RankZone == RankZones::Continent) {
-            return pb.ContinentPosition;
+            return pb.pb.ContinentPosition;
         } else if (RankZone == RankZones::Country) {
-            return pb.CountryPosition;
+            return pb.pb.CountryPosition;
         } else if (RankZone == RankZones::Province) {
-            return pb.ProvincePosition;
+            return pb.pb.ProvincePosition;
         }
         return 0;
     }

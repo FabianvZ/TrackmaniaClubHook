@@ -14,7 +14,7 @@ class OrdinalWebhookFilter : WebhookFilterElement {
         super(data, label);
     }
 
-    int GetValue(PB@ pb) {
+    int GetValue(ClubPB@ pb) {
         throw("Not implemented - GetValue");
         return 0;
     }
@@ -51,7 +51,7 @@ class OrdinalWebhookFilter : WebhookFilterElement {
         }
     }
 
-    bool Solve(PB@ pb) override {
+    bool Solve(ClubPB@ pb) override {
         int value = GetValue(pb);
         if (OrdinalComparison == OrdinalComparisons::Equal) {
             return value == Value;
