@@ -1,9 +1,9 @@
 enum RankZones {
-    Club,
     World,
     Continent,
     Country,
-    Province
+    Province,
+    Club
 }
 
 namespace RankZones {
@@ -29,15 +29,15 @@ namespace RankZones {
     RankZones FromValue(int rf) {
         switch (rf) {
             case 0:
-                return RankZones::Club;
-            case 1:
                 return RankZones::World;
-            case 2:
+            case 1:
                 return RankZones::Continent;
-            case 3:
+            case 2:
                 return RankZones::Country;
-            case 4:
+            case 3:
                 return RankZones::Province;
+            case 4:
+                return RankZones::Club;
         }
 
         throw("Not implemented - RankFilter: " + rf);

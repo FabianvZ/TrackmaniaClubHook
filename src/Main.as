@@ -27,7 +27,6 @@ void Main()
     }
 #endif
     Legacy::migrateOldWebhookSettings();
-    Legacy::migrateOldGrindingStatsData();
 
     sendPBShortcut.key = togglePBKey;
     forceSendShortcut.key = forceSendKey;
@@ -42,7 +41,7 @@ void PBLoop()
     string lastMapUid;
     Map@ map;
     User@ user = User(app.LocalPlayerInfo);
-    uint previousScore, previousPosition;
+    uint previousScore;
 
     while (true)
     {
@@ -88,7 +87,7 @@ void PBLoop()
             send_pb_manual = false;
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
-                PB @pb = PB(user, map, previousScore, currentPB, previousPosition, previousPosition, WebhookSettings::webhooks[i].ClubId);
+                ClubPB @pb = ClubPB(PB(user, map, previousScore, currentPB), WebhookSettings::webhooks[i].previousPosition, WebhookSettings::webhooks[i].previousPosition, WebhookSettings::webhooks[i].ClubId);
                 WebhookSettings::webhooks[i].Send(pb);
             }
         }

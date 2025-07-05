@@ -1,7 +1,7 @@
 class RankFilter : OrdinalWebhookFilter {
 
     RankZones RankZone {
-        get { return Data.HasKey("RankZone")? RankZones::FromValue(Data["RankZone"]) : RankZones::Club; }
+        get { return Data.HasKey("RankZone")? RankZones::FromValue(Data["RankZone"]) : RankZones::World; }
         set { Data["RankZone"] = value; }
     }
 

@@ -1,8 +1,8 @@
 class MedalFilter : OrdinalWebhookFilter {
 
     Medal Medal {
-        get { return Data.HasKey("Medal")?  Medal::FromValue(Data["Medal"]) : Medal::Author; }
-        set { Data["Medal"] = value; }
+        get { return Medal::FromValue(Value); }
+        set { Value = value; }
     }
 
     MedalFilter(Json::Value@ data, const string &in label) {

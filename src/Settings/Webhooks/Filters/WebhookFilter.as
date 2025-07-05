@@ -7,7 +7,7 @@ class WebhookFilter : JsonSetting {
         this.label = label;
     }
 
-    bool Solve(PB@ pb) {
+    bool Solve(ClubPB@ pb) {
         throw("Not implemented - Solve");
         return false;
     }
