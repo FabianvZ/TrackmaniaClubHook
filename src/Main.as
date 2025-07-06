@@ -73,6 +73,7 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             previousScore = GetCurrBestTime(app, map.Uid);
+            Leaderboards::cache.DeleteAll();
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
                 WebhookSettings::webhooks[i].UpdatePosition(map, previousScore);
