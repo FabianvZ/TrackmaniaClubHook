@@ -94,10 +94,11 @@ void PBLoop()
 
         if (previousScore > currentPB) {
             Log("New PB: " + previousScore + " -> " + currentPB);
+            PB@ pb = PB(user, map, previousScore, currentPB);
 
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
-                WebhookSettings::webhooks[i].Send(user, map, previousScore, currentPB);
+                WebhookSettings::webhooks[i].Send(pb, map, previousScore, currentPB);
             }
 
             previousScore = currentPB;

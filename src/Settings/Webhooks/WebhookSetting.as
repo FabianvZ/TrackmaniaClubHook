@@ -79,7 +79,7 @@ class WebhookSetting : JsonSetting {
         previousPosition = GetClubLeaderboardPosition(map.Uid, score)["position"];
     }
 
-    void Send(User@ user, Map@ map, uint previousScore, uint currentScore) {
+    void Send(PB@ pb, Map@ map, uint previousScore, uint currentScore) {
         uint position;
         Json::Value@ positionRequest = GetClubLeaderboardPosition(map.Uid, previousScore);
         if (uint(positionRequest["score"]) == previousScore) {
@@ -92,9 +92,9 @@ class WebhookSetting : JsonSetting {
         Log("Club " + Name + " Position: " + previousPosition + " -> " + position);
         if (position < previousPosition) {
 
-            ClubPB @pb = ClubPB(PB(user, map, previousScore, currentScore), previousPosition, position, ClubId);
-            if (!Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
-                Send(pb);
+            ClubPB @clubpb = ClubPB(pb, previousPosition, position, ClubId);
+            if (!Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(clubpb)) {
+                Send(clubpb);
             }
         }
         previousPosition = position;
