@@ -15,7 +15,7 @@ class ClubPB {
 
     private void BuildLeaderboard()
     {
-        Json::Value@ leaderboard = Leaderboards::Get(pb.Map.Uid, ClubId);
+        Json::Value@ leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + pb.Map.Uid + "/club/" + ClubId + "/top?length=100&offset=0")["top"];
         int position = 0;
         int maxUsernameLength = 0;
         LeaderboardFragments.InsertLast("");

@@ -79,45 +79,26 @@ class WebhookSetting : JsonSetting {
         previousPosition = GetClubLeaderboardPosition(map.Uid, score)["position"];
     }
 
-    void Send(PB@ pb, Map@ map, uint previousScore, uint currentScore) {
-        uint position;
-        Json::Value@ positionRequest = GetClubLeaderboardPosition(map.Uid, previousScore);
-        if (uint(positionRequest["score"]) == previousScore) {
-            previousPosition = positionRequest["position"];
-            position = GetClubLeaderboardPosition(map.Uid, currentScore)["position"];
-        } else {
-            position = positionRequest["position"];
-        }
+    void Send(ClubPB@ pb, bool force = false) {
+        if (force || !Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
+            Net::HttpRequest@ response = DiscordWebHook(pb, WebhookUrl).Send();
 
-        Log("Club " + Name + " Position: " + previousPosition + " -> " + position);
-        if (position < previousPosition) {
-
-            ClubPB @clubpb = ClubPB(pb, previousPosition, position, ClubId);
-            if (!Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(clubpb)) {
-                Send(clubpb);
+            if (response.ResponseCode() != 204)
+            {
+                UI::ShowNotification(
+                        "Discord Rivalry Ping",
+                        "Sending to discord webhook failed.",
+                        UI::HSV(0.10f, 1.0f, 1.0f), 7500);
+                error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
+                Log(response.Body);
+                Log("Length: " + response.Body.Length);
+                Log(response.Error());
+                Log(response.String());
             }
-        }
-        previousPosition = position;
-    }
-
-    void Send(ClubPB@ pb) {
-        Net::HttpRequest@ response = DiscordWebHook(pb, WebhookUrl).Send();
-
-        if (response.ResponseCode() != 204)
-        {
-            UI::ShowNotification(
-                    "Discord Rivalry Ping",
-                    "Sending to discord webhook failed.",
-                    UI::HSV(0.10f, 1.0f, 1.0f), 7500);
-            error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
-            Log(response.Body);
-            Log("Length: " + response.Body.Length);
-            Log(response.Error());
-            Log(response.String());
-        }
-        else
-        {
-            Log("Sent " + Name + " to Discord");
+            else
+            {
+                Log("Sent " + Name + " to Discord");
+            }
         }
     }
 

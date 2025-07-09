@@ -73,7 +73,6 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             previousScore = GetCurrBestTime(app, map.Uid);
-            Leaderboards::cache.DeleteAll();
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
                 WebhookSettings::webhooks[i].UpdatePosition(map, previousScore);
@@ -88,18 +87,45 @@ void PBLoop()
             send_pb_manual = false;
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
-                ClubPB @pb = ClubPB(PB(user, map, previousScore, currentPB), WebhookSettings::webhooks[i].previousPosition, WebhookSettings::webhooks[i].previousPosition, WebhookSettings::webhooks[i].ClubId);
-                WebhookSettings::webhooks[i].Send(pb);
+                WebhookSetting@ webhook = WebhookSettings::webhooks[i];
+                ClubPB @pb = ClubPB(PB(user, map, previousScore, currentPB), webhook.previousPosition, webhook.previousPosition, webhook.ClubId);
+                WebhookSettings::webhooks[i].Send(pb, true);
             }
         }
 
         if (previousScore > currentPB) {
             Log("New PB: " + previousScore + " -> " + currentPB);
             PB@ pb = PB(user, map, previousScore, currentPB);
+            dictionary cache = dictionary();
 
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
-                WebhookSettings::webhooks[i].Send(pb, map, previousScore, currentPB);
+                WebhookSetting@ webhook = WebhookSettings::webhooks[i];
+                if (cache.Exists(webhook.ClubId + "")) {
+                    if (cast<ClubPB@>(cache[webhook.ClubId + ""]) is null) {
+                        continue;  // Skipping because the clubpb is not improved
+                    }
+                } else {
+                    uint position;
+                    Json::Value@ positionRequest = webhook.GetClubLeaderboardPosition(map.Uid, previousScore);
+                    if (uint(positionRequest["score"]) == previousScore) {
+                        webhook.previousPosition = positionRequest["position"];
+                        position = webhook.GetClubLeaderboardPosition(map.Uid, currentPB)["position"];
+                    } else {
+                        position = positionRequest["position"];
+                    }
+
+                    Log("Club " + webhook.Name + " Position: " + webhook.previousPosition + " -> " + position);
+                    if (position < webhook.previousPosition) {
+                        cache[webhook.ClubId + ""] = @ClubPB(pb, webhook.previousPosition, position, webhook.ClubId);
+                    } else {
+                        cache[webhook.ClubId + ""] = null;
+                        continue; // Skipping because the clubpb is not improved
+                    }
+                    webhook.previousPosition = position;
+                }
+
+                webhook.Send(cast<ClubPB@>(cache[webhook.ClubId + ""]));
             }
 
             previousScore = currentPB;

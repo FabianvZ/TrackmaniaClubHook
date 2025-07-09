@@ -57,7 +57,6 @@ namespace WebhookSettings {
     } 
     
     void Initialize() {
-        Log(settings_webhooks);
         @_webhooks = Json::Parse(settings_webhooks);
         if (_webhooks.GetType() != Json::Type::Array)
         {
@@ -65,7 +64,6 @@ namespace WebhookSettings {
         }
         for (uint i = 0; i < _webhooks.Length; i++)
         {
-            Log(Json::Write(_webhooks[i]));
             webhooks.InsertLast(@WebhookSetting(_webhooks[i]));
         }
     }
