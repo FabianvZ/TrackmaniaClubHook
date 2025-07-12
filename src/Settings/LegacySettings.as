@@ -21,7 +21,7 @@ namespace Legacy {
         Json::Value@ filters;
         Json::Value@ currentGroup;
 
-        for (int i = 0; i < rawParts.Length - 1; i++) {
+        for (uint i = 0; i < rawParts.Length - 1; i++) {
           Json::Value@ filter = Json::Object();
           array<string> parts = rawParts[i].Split(",");
 
@@ -46,7 +46,7 @@ namespace Legacy {
           }
 
           filter["Value"] = Text::ParseInt(parts[2]);
-          if (currentGroup == null) {
+          if (@currentGroup == null) {
             @currentGroup = filter;
           } else {
             @currentGroup = createComparison(currentGroup, filter, Comparisons::And);

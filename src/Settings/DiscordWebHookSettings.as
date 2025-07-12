@@ -124,7 +124,7 @@ void RenderDiscordSettings()
                 for (uint i = 0; i < parts.Length; i++) {
                     array<string> nameParts = parts[i].Split(";");
                     string entry = parts[i];
-                    for (int j = 0; j < newParts.Length; j++) {
+                    for (uint j = 0; j < newParts.Length; j++) {
                         if (newParts[j].Split(";")[0] == nameParts[0]) {
                             entry = newParts[j];
                             newParts.RemoveAt(j);
@@ -134,7 +134,7 @@ void RenderDiscordSettings()
                     settings_usernames += (settings_usernames.Length > 0? "\n" : "") + entry;
                 }
 
-                for (int i = 0; i < newParts.Length; i++) {
+                for (uint i = 0; i < newParts.Length; i++) {
                     settings_usernames += (settings_usernames.Length > 0? "\n" : "") + newParts[i];
                 }
 

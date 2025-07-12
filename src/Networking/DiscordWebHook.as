@@ -1,7 +1,7 @@
 class DiscordWebHook : WebRequest
 {
 
-    DiscordWebHook(ClubPB@ clubPB, string discordURL)
+    DiscordWebHook(ClubPB@ clubPB, const string &in discordURL)
     {
         super(Net::HttpMethod::Post, discordURL, Json::Parse(DiscordDefaults::Header), GetInterpolatedBody(clubPB), true, true);
     }

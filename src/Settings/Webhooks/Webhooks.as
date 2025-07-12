@@ -47,7 +47,7 @@ namespace WebhookSettings {
 
             if (UI::Button("Import")) {
                 Json::Value@ import_webhook_json = Json::Parse(import_webhook);
-                if (import_webhook_json == null || import_webhook_json.GetType() != Json::Type::Object) {
+                if (@import_webhook_json == null || import_webhook_json.GetType() != Json::Type::Object) {
                     import_error_message = "Import text not valid";
                 } else {
                     showImportPopup = false;
