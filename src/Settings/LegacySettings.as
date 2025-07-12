@@ -76,10 +76,9 @@ namespace Legacy {
       filters.Add(data);
       WebhookSettings::settings_webhooks = Json::Write(filters);
 
-      // TODO uncomment this when the migration is ready
-      // settings_discord_URL = DiscordDefaults::URL;
-      // clubId = -1;
-      // settings_filter_string = "";
+      settings_discord_URL = DiscordDefaults::URL;
+      clubId = -1;
+      settings_filter_string = "";
     }
   }
 
