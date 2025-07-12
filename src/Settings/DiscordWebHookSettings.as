@@ -97,12 +97,12 @@ void RenderDiscordSettings()
         UI::EndTable();
     }
 
-    if (UI::Button(Icons::Clipboard	 + " export discord ping settings"))
+    if (UI::Button(Icons::Clipboard + " export discord ping settings"))
     {
         IO::SetClipboard(settings_usernames);
     }
     UI::SameLine();
-    if (UI::Button(Icons::Clipboard	 + " import discord ping settings"))
+    if (UI::Button(Icons::ArrowCircleDown + " import discord ping settings"))
     {
         showImportPopup = true;
     }
