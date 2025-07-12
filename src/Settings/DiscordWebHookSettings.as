@@ -8,9 +8,6 @@ string settings_discord_user_id = DiscordDefaults::UserId;
 bool settings_inline_columns = false;
 
 [Setting hidden]
-bool settings_AdvancedDiscordSettings = false;
-
-[Setting hidden]
 string settings_no_medal_string = DiscordDefaults::NoMedal;
 
 [Setting hidden]
@@ -132,12 +129,6 @@ void RenderDiscordSettings()
         UI::End();
     }   
 
-    settings_AdvancedDiscordSettings = UI::Checkbox("Advanced Settings", settings_AdvancedDiscordSettings);
-
-    if (!settings_AdvancedDiscordSettings) return;
-
-    // Advanced settings
-
     UI::BeginTabBar("DiscordWebHookSettings", UI::TabBarFlags::FittingPolicyResizeDown);
 #if DEPENDENCY_DISCORD
     if (UI::BeginTabItem(Icons::Cogs + " General"))
@@ -161,7 +152,6 @@ void RenderResetButton()
     {
         settings_discord_user_id = DiscordDefaults::UserId;
         settings_SendPB = true;
-        settings_AdvancedDiscordSettings = false;
         settings_no_medal_string = DiscordDefaults::NoMedal;
         settings_bronze_medal_string = DiscordDefaults::BronzeMedal;
         settings_silver_medal_string = DiscordDefaults::SilverMedal;

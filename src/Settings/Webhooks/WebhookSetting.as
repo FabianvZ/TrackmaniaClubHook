@@ -27,6 +27,12 @@ class WebhookSetting : JsonSetting {
             return true;
         }
 
+        UI::SameLine();
+        if (UI::Button(Icons::Clipboard + " Export webhook to clipboard")) {
+            Json::Value@ newData = Json::Object();
+            IO::SetClipboard(Json::Write(Data));
+        }
+
         Name = UI::InputText("Name", Name);
         WebhookUrl = UI::InputText("WebhookUrl", WebhookUrl);
 
