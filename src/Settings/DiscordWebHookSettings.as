@@ -129,21 +129,8 @@ void RenderDiscordSettings()
         UI::End();
     }   
 
-    UI::BeginTabBar("DiscordWebHookSettings", UI::TabBarFlags::FittingPolicyResizeDown);
-#if DEPENDENCY_DISCORD
-    if (UI::BeginTabItem(Icons::Cogs + " General"))
-    {
-        settings_discord_user_id = UI::InputText("Discord User-ID", settings_discord_user_id);
-		UI::EndTabItem();
-    }
-#endif
-    if (UI::BeginTabItem(Icons::Kenney::Radio + " Medals"))
-    {
-        RenderMedalInput();
-		UI::EndTabItem();
-    }
-    
-    UI::EndTabBar();
+    UI::SeparatorText("Medal emojis");
+    RenderMedalInput();
 }
 
 void RenderResetButton()
