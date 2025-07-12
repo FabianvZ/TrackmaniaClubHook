@@ -116,9 +116,29 @@ void RenderDiscordSettings()
             if (!Contains(import_settings_usernames.Split("\n"), ";")) {
                 import_error_message = "Import text not valid";
             } else {
-                showImportPopup = false;
-                settings_usernames = import_settings_usernames;
+                array<string> parts = settings_usernames.Split("\n");
+                array<string> newParts = import_settings_usernames.Split("\n");
+                settings_usernames = "";
                 import_settings_usernames = "";
+
+                for (uint i = 0; i < parts.Length; i++) {
+                    array<string> nameParts = parts[i].Split(";");
+                    string entry = parts[i];
+                    for (int j = 0; j < newParts.Length; j++) {
+                        if (newParts[j].Split(";")[0] == nameParts[0]) {
+                            entry = newParts[j];
+                            newParts.RemoveAt(j);
+                            break;
+                        }
+                    }
+                    settings_usernames += (settings_usernames.Length > 0? "\n" : "") + entry;
+                }
+
+                for (int i = 0; i < newParts.Length; i++) {
+                    settings_usernames += (settings_usernames.Length > 0? "\n" : "") + newParts[i];
+                }
+
+                showImportPopup = false;
                 import_error_message = "";
             }
         }
