@@ -16,15 +16,30 @@ class ClubPB {
     private void BuildLeaderboard()
     {
         Json::Value@ leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + pb.Map.Uid + "/club/" + ClubId + "/top?length=100&offset=0")["top"];
-        int position = 0;
-        int maxUsernameLength = 0;
-        LeaderboardFragments.InsertLast("");
-
-        // Determine max username length for padding
+        auto ums = GetApp().UserManagerScript;
+        MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
         for (uint i = 0; i < leaderboard.Length; i++) {
-            maxUsernameLength = Math::Max(maxUsernameLength, GetPlayerDisplayName(leaderboard[i]["accountId"]).Length);
+            playerIds.Add(wstring(leaderboard[i]["accountId"]));
         }
 
+        auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
+        while (req.IsProcessing)
+        {
+            yield();
+        }
+
+        for (uint i = 0; i < playerIds.Length; i++)
+        {
+            leaderboard[i]["username"] = string(req.GetDisplayName(wstring(playerIds[i])));
+        }
+
+        int maxUsernameLength = 0;
+        for (uint i = 0; i < leaderboard.Length; i++) {
+            maxUsernameLength = Math::Max(maxUsernameLength, leaderboard[i]["username"].Length);
+        }
+
+        uint position = 0;
+        array<string> beatenPlayers = {};
         for (uint i = 0; i < leaderboard.Length; i++) {
             if (i == ClubPosition - 1) {
                 InsertLeaderBoardEntry(position++, pb.User.Name, pb.Score, maxUsernameLength);
@@ -34,18 +49,18 @@ class ClubPB {
                 continue;
             }
 
-            string username = GetPlayerDisplayName(leaderboard[i]["accountId"]);
-            InsertLeaderBoardEntry(position++, username, leaderboard[i]["score"], maxUsernameLength);
+            InsertLeaderBoardEntry(position++, leaderboard[i]["username"], leaderboard[i]["score"], maxUsernameLength);
 
             if (i >= ClubPosition - 1 && i < PreviousClubPosition) {
-                Losers += GetDiscordUserId(username);
-                if (i + 3 < PreviousClubPosition) {
-                    Losers += ", ";
-                } else if (i + 3 == PreviousClubPosition) {
-                    Losers += " & ";
-                }
+                beatenPlayers.InsertLast(GetDiscordUserId(leaderboard[i]["username"]));
             }
         }
+
+        Losers = beatenPlayers[beatenPlayers.Length - 1];
+        if (beatenPlayers.Length > 1) {
+            beatenPlayers.RemoveLast();
+            Losers = string::Join(beatenPlayers, ", ") + " & " + Losers;
+        } 
     }
 
     private void InsertLeaderBoardEntry(int position, const string &in username, uint score, int maxUsernameLength)
