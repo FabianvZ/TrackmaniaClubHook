@@ -89,7 +89,7 @@ class WebhookSetting : JsonSetting {
         if (force || !Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
             Net::HttpRequest@ response = DiscordWebHook(pb, WebhookUrl).Send();
 
-            if (response.ResponseCode() != 204)
+            if (response.ResponseCode() < 200 || response.ResponseCode() >= 300)
             {
                 UI::ShowNotification(
                         "Discord Rivalry Ping",
