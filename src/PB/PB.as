@@ -26,10 +26,14 @@ class PB
         requestbody["maps"].Add(mapJson);
         Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map?scores[" + mapUid +  "]=" + time, requestbody)[0];
         Log(Json::Write(personalBest));
-        WorldPosition = personalBest["zones"][0]["ranking"]["position"];
-        ContinentPosition = personalBest["zones"][1]["ranking"]["position"];   
-        CountryPosition = personalBest["zones"][2]["ranking"]["position"];
-        ProvincePosition = personalBest["zones"][3]["ranking"]["position"]; 
+        WorldPosition = getScore(personalBest, 0);
+        ContinentPosition = getScore(personalBest, 1);   
+        CountryPosition = getScore(personalBest, 2);
+        ProvincePosition = getScore(personalBest, 3); 
+    }
+
+    private uint getScore(Json::Value@ json, uint index) {
+        return json.Length >= index ? json[index]["ranking"]["position"] : 0;
     }
 
     private Medal GetReachedMedal(Map@ map, uint currentPB)
