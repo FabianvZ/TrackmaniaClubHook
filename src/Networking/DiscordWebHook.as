@@ -27,7 +27,7 @@ class DiscordWebHook : WebRequest
         AddField(fields, "Map", "[" + map.CleansedName + "](" + URL::TrackmaniaIOLeaderboard + map.Uid + ") by [" + map.AuthorName + "](" + URL::TrackmaniaIOPlayer + map.AuthorLogin + ")");
         AddField(fields, "Time", "" + (clubPB.pb.Score == uint(-1) ? "Secret" : Time::Format(clubPB.pb.Score)) + (clubPB.pb.PreviousScore == uint(-1) || clubPB.pb.Score == uint(-1) ? "" : " (-" + Time::Format(clubPB.pb.PreviousScore - clubPB.pb.Score) + ")"), true);
         AddField(fields, "Rank", "" + clubPB.pb.WorldPosition, true);
-#if DEPENDENCY_Grindingstats
+#if DEPENDENCY_GRINDINGSTATS
         AddField(fields, "GrindTime", Time::Format(GrindingStats::GetSessionTime()) +  " / " + Time::Format(GrindingStats::GetTotalTime()));
         AddField(fields, "Finishes", GrindingStats::GetSessionFinishes() +  " / " + GrindingStats::GetTotalFinishes(), true);
         AddField(fields, "Resets", GrindingStats::GetSessionResets() + " / " + GrindingStats::GetTotalResets(), true);

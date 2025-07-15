@@ -33,7 +33,7 @@ class PB
     }
 
     private uint getScore(Json::Value@ json, uint index) {
-        return json.Length >= index ? json[index]["ranking"]["position"] : 0;
+        return json.Length >= index ? json["zones"][index]["ranking"]["position"] : 0;
     }
 
     private Medal GetReachedMedal(Map@ map, uint currentPB)

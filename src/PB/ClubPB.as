@@ -2,7 +2,7 @@ class ClubPB {
 
     PB@ pb;
     uint ClubId, ClubPosition, PreviousClubPosition;
-    array<string> LeaderboardFragments;
+    array<string> LeaderboardFragments = { ""};
     string Losers = "";
     
     ClubPB(PB@ pb, uint previousPosition, uint position, uint clubId) {
@@ -35,7 +35,7 @@ class ClubPB {
 
         int maxUsernameLength = 0;
         for (uint i = 0; i < leaderboard.Length; i++) {
-            maxUsernameLength = Math::Max(maxUsernameLength, leaderboard[i]["username"].Length);
+            maxUsernameLength = Math::Max(maxUsernameLength, string(leaderboard[i]["username"]).Length);
         }
 
         uint position = 0;
