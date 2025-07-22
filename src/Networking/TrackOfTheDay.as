@@ -1,13 +1,31 @@
 namespace TrackOfTheDay {
-
-    Json::Value@ _data;
+    Json::Value@ _monthData;
 
     bool IsTrackOfTheDay(Map@ map) {
-        if (_data is null || uint(_data["endDate"]) < Time::get_Now()) {
-            @_data = Nadeo::LiveServiceRequest("/api/cup-of-the-day/current", "https://meet.trackmania.nadeo.club");
+        uint64 now = Time::get_Stamp();
+        if (_monthData is null || _monthData["nextRequestTimestamp"] <= now) {
+            @_monthData = Nadeo::LiveServiceRequest("/api/token/campaign/month?offset=0&length=1");
         }
-        Log(Json::Write(_data));
-        return _data["challenge"]["uid"] == map.Uid;
-    }
 
+        if (!_monthData.HasKey("monthList") || _monthData["monthList"].Length == 0)
+            return false;
+
+        auto month = _monthData["monthList"][0];
+        auto days = month["days"];
+        if (days is null) 
+            return false;
+
+        for (uint i = 0; i < days.Length; i++) {
+            auto day = days[i];
+            if (map.Uid == string(day["mapUid"])) {
+                uint start = day["startTimestamp"];
+                uint end   = day["endTimestamp"];
+                if (now >= start && now < end) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
