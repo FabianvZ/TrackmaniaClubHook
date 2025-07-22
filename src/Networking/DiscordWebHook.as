@@ -28,9 +28,11 @@ class DiscordWebHook : WebRequest
         AddField(fields, "Time", "" + (clubPB.pb.Score == uint(-1) ? "Secret" : Time::Format(clubPB.pb.Score)) + (clubPB.pb.PreviousScore == uint(-1) || clubPB.pb.Score == uint(-1) ? "" : " (-" + Time::Format(clubPB.pb.PreviousScore - clubPB.pb.Score) + ")"), true);
         AddField(fields, "Rank", "" + clubPB.pb.WorldPosition, true);
 #if DEPENDENCY_GRINDINGSTATS
-        AddField(fields, "GrindTime", Time::Format(GrindingStats::GetSessionTime()) +  " / " + Time::Format(GrindingStats::GetTotalTime()));
-        AddField(fields, "Finishes", GrindingStats::GetSessionFinishes() +  " / " + GrindingStats::GetTotalFinishes(), true);
-        AddField(fields, "Resets", GrindingStats::GetSessionResets() + " / " + GrindingStats::GetTotalResets(), true);
+        if (send_grinding_stats) {
+            AddField(fields, "GrindTime", Time::Format(GrindingStats::GetSessionTime()) +  " / " + Time::Format(GrindingStats::GetTotalTime()));
+            AddField(fields, "Finishes", GrindingStats::GetSessionFinishes() +  " / " + GrindingStats::GetTotalFinishes(), true);
+            AddField(fields, "Resets", GrindingStats::GetSessionResets() + " / " + GrindingStats::GetTotalResets(), true);
+        }
 #endif
         AddField(fields, "Club Position", clubPB.PreviousClubPosition + (improved? " -> " + clubPB.ClubPosition : ""));
         for (uint i = 0; i < clubPB.LeaderboardFragments.Length; i++) {

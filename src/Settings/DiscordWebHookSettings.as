@@ -28,6 +28,9 @@ string settings_champion_medal_string = DiscordDefaults::ChampionMedal;
 [Setting hidden]
 string settings_usernames = DiscordDefaults::usernames;
 
+[Setting hidden]
+bool send_grinding_stats = true;
+
 bool showImportPopup = false;
 string import_settings_usernames = "";
 string import_error_message = "";
@@ -41,6 +44,10 @@ void RenderDiscordSettings()
     UI::SetTooltip("Enable to send PBs to Discord. You can set a shortcut for this in the settings tab.");
     settings_inline_columns = UI::Checkbox("Inline columns in webhook", settings_inline_columns);
     UI::SetTooltip("Enable to show show splitted leaderboards next to each other in the webhook. A leaderboard will split at around 30 entries depending on the length of the longest name. If not enabled the leaderboard fragments will be displayed below each other.");
+
+#if DEPENDENCY_GRINDINGSTATS
+    send_grinding_stats = UI::Checkbox("Send grinding stats", send_grinding_stats);
+#endif
 
 #if !DEPENDENCY_DISCORD
     settings_discord_user_id = UI::InputText("Discord User-ID", settings_discord_user_id);
