@@ -142,26 +142,6 @@ uint GetCurrBestTime(CTrackMania@ app, const string &in mapUid)
     return score_manager.Map_GetRecord_v2(user.Id, mapUid, "PersonalBest", "", "TimeAttack", "");
 }
 
-string GetPlayerDisplayName(const string &in accountId)
-{
-    auto ums = GetApp().UserManagerScript;
-    MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
-    playerIds.Add(accountId);
-
-    auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
-    while (req.IsProcessing)
-    {
-        yield();
-    }
-
-    string[] playerNames = array<string>(playerIds.Length);
-    for (uint i = 0; i < playerIds.Length; i++)
-    {
-        playerNames[i] = string(req.GetDisplayName(wstring(playerIds[i])));
-    }
-    return playerNames[0];
-}
-
 MwId GetMainUserId() {
     auto app = cast<CTrackMania>(GetApp());
     if (app.ManiaPlanetScriptAPI.UserMgr.MainUser !is null) {

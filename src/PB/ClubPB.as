@@ -16,21 +16,15 @@ class ClubPB {
     private void BuildLeaderboard()
 {
     Json::Value@ leaderboard = Nadeo::LiveServiceRequest("/api/token/leaderboard/group/Personal_Best/map/" + pb.Map.Uid + "/club/" + ClubId + "/top?length=100&offset=0")["top"];
-    auto ums = GetApp().UserManagerScript;
-    MwFastBuffer<wstring> playerIds = MwFastBuffer<wstring>();
+    array<string> playerIds = {};
     for (uint i = 0; i < leaderboard.Length; i++) {
-        playerIds.Add(wstring(leaderboard[i]["accountId"]));
+        playerIds.InsertLast(string(leaderboard[i]["accountId"]));
     }
 
-    auto req = ums.GetDisplayName(GetMainUserId(), playerIds);
-    while (req.IsProcessing)
-    {
-        yield();
-    }
-
+    dictionary usernames = NadeoServices::GetDisplayNamesAsync(playerIds);
     for (uint i = 0; i < playerIds.Length; i++)
     {
-        leaderboard[i]["username"] = string(req.GetDisplayName(wstring(playerIds[i])));
+        leaderboard[i]["username"] = string(usernames[leaderboard[i]["accountId"]]);
     }
 
     int maxUsernameLength = pb.User.Name.Length;
@@ -61,7 +55,6 @@ class ClubPB {
     float maxLinesPerColumn = Math::Floor((1024 - 8) / (maxUsernameLength + 14));
     float columnCount = uint(Math::Ceil(allEntries.Length / maxLinesPerColumn));
     uint linesPerColumn = uint(Math::Ceil(allEntries.Length / columnCount));
-    Log("Max lines per column: " + maxLinesPerColumn + ", lines per column: " + linesPerColumn + ", total entries: " + allEntries.Length);
     for (uint i = 0; i < allEntries.Length; i++) {
         if (i % linesPerColumn == 0) {
             LeaderboardFragments.InsertLast("");
@@ -69,11 +62,6 @@ class ClubPB {
         if (allEntries[i].Length > 0) {
             LeaderboardFragments[LeaderboardFragments.Length - 1] += allEntries[i];
         }
-    }
-
-    Log(LeaderboardFragments.Length + " columns with " + linesPerColumn + " lines each, total " + allEntries.Length + " entries");
-    for (uint i = 0; i < LeaderboardFragments.Length; i++) {
-        Log("Column " + i + ": " + LeaderboardFragments[i].Length + " characters");
     }
 
     Losers = beatenPlayers.Length > 0 ? beatenPlayers[beatenPlayers.Length - 1] : "";
