@@ -1,7 +1,7 @@
 namespace WebhookSettings {
 
     [Setting hidden]
-    string settings_webhooks = "[{}]";	    
+    string settings_webhooks = "[]";	    
     Json::Value@ _webhooks;
     array<WebhookSetting@> webhooks;
 
