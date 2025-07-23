@@ -41,6 +41,9 @@ class PB
 #if DEPENDENCY_CHAMPIONMEDALS
         if (currentPB <= map.ChampionMedalTime) return Medal::Champion;
 #endif
+#if DEPENDENCY_WARRIORMEDALS
+        if (currentPB <= map.WarriorMedalTime) return Medal::Warrior;
+#endif
         if (currentPB <= map.AuthorMedalTime) return Medal::Author;
         if (currentPB <= map.GoldMedalTime) return Medal::Gold;
         if (currentPB <= map.SilverMedalTime) return Medal::Silver;

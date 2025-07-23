@@ -26,6 +26,9 @@ string settings_at_medal_string = DiscordDefaults::AuthorMedal;
 string settings_champion_medal_string = DiscordDefaults::ChampionMedal;
 
 [Setting hidden]
+string settings_warrior_medal_string = DiscordDefaults::WarriorMedal;
+
+[Setting hidden]
 string settings_usernames = DiscordDefaults::usernames;
 
 [Setting hidden]
@@ -172,6 +175,7 @@ void RenderResetButton()
         settings_gold_medal_string = DiscordDefaults::GoldMedal;
         settings_at_medal_string = DiscordDefaults::AuthorMedal;
         settings_champion_medal_string = DiscordDefaults::ChampionMedal;
+        settings_warrior_medal_string = DiscordDefaults::WarriorMedal;
         settings_usernames = DiscordDefaults::usernames;
     }
 }
@@ -192,6 +196,11 @@ void RenderMedalInput()
 
     settings_at_medal_string = UI::InputText("##at_medal", settings_at_medal_string);
     RenderMedalInputHelp("author", "<:at_medal:1223564741642027079>");
+
+#if DEPENDENCY_WARRIORMEDALS
+    settings_warrior_medal_string = UI::InputText("##warrior_medal", settings_warrior_medal_string);
+    RenderMedalInputHelp("warrior", "<:warrior_medal:1397582674515984555>");
+#endif
 
 #if DEPENDENCY_CHAMPIONMEDALS
     settings_champion_medal_string = UI::InputText("##champion_medal", settings_champion_medal_string);

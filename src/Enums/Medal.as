@@ -5,6 +5,7 @@ enum Medal
     Silver,
     Gold,
     Author,
+    Warrior,
     Champion
 }
 
@@ -26,6 +27,8 @@ namespace Medal
                 return "Author Medal";
             case Medal::Champion:
                 return "Champion Medal";
+            case Medal::Warrior:
+                return "Warrior Medal";
         }
 
         throw("Not implemented - Medal: " + medal);
@@ -48,6 +51,8 @@ namespace Medal
                 return settings_at_medal_string;
             case Medal::Champion:
                 return settings_champion_medal_string;
+            case Medal::Warrior:
+                return settings_warrior_medal_string;
         }
 
         throw("Not implemented - Medal: " + medal);
@@ -68,8 +73,10 @@ namespace Medal
                 return 3;
             case Medal::Author:
                 return 4;
-            case Medal::Champion:
+            case Medal::Warrior:
                 return 5;
+            case Medal::Champion:
+                return 6;
         }
 
         throw("Not implemented - Medal: " + medal);
@@ -92,6 +99,8 @@ namespace Medal
             case 4:
                 return Medal::Author;
             case 5:
+                return Medal::Warrior;
+            case 6:
                 return Medal::Champion;
         }
 

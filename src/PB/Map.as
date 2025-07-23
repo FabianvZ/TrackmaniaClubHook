@@ -10,6 +10,7 @@ class Map
     uint GoldMedalTime;
     uint AuthorMedalTime;
     uint ChampionMedalTime;
+    uint WarriorMedalTime;
 
     int TrackId;
 
@@ -27,6 +28,12 @@ class Map
         AuthorMedalTime = map.TMObjective_AuthorTime;
 #if DEPENDENCY_CHAMPIONMEDALS
         ChampionMedalTime = ChampionMedals::GetCMTime();
+#endif
+#if DEPENDENCY_WARRIORMEDALS
+        WarriorMedalTime = WarriorMedals::GetWMTime();
+        if (WarriorMedalTime == 0) {
+            WarriorMedalTime = WarriorMedals::GetWMTimeAsync();
+        }
 #endif
 
         WebRequest webRequest = 

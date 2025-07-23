@@ -18,6 +18,12 @@ class MedalFilter : OrdinalWebhookFilter {
                 Medal = Medal::Champion;
             } else
 #endif
+#if DEPENDENCY_WARRIORMEDALS
+            if (UI::Selectable(Medal::ToString(Medal::Warrior), Medal == Medal::Warrior))
+            {
+                Medal = Medal::Warrior;
+            } else
+#endif
             if (UI::Selectable(Medal::ToString(Medal::Author), Medal == Medal::Author))
             {
                 Medal = Medal::Author;

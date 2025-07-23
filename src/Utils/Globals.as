@@ -17,4 +17,5 @@ namespace DiscordDefaults
     string GoldMedal = "<:gold_medal:1258139948301943015>";
     string AuthorMedal = "<:author_medal:1258140024663445575>";
     string ChampionMedal = "<:champion_medal:1258164329576923248>";
+    string WarriorMedal = "<:warrior_medal:1397582674515984555>";
 }
