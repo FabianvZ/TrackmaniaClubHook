@@ -73,6 +73,7 @@ void PBLoop()
             lastMapUid = currentMap.MapInfo.MapUid;
             @map = Map(currentMap);
             previousScore = GetCurrBestTime(app, map.Uid);
+            Testing::force_send_pb_time = previousScore;
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
                 WebhookSettings::webhooks[i].UpdatePosition(map, previousScore);
