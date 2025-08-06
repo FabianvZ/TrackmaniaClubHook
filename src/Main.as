@@ -83,17 +83,7 @@ void PBLoop()
         uint currentPB = Testing::force_send_pb? Testing::force_send_pb_time : GetCurrBestTime(app, map.Uid);
         Testing::force_send_pb = false;
 
-        if (send_pb_manual) {
-            send_pb_manual = false;
-            for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
-            {
-                WebhookSetting@ webhook = WebhookSettings::webhooks[i];
-                ClubPB @pb = ClubPB(PB(user, map, previousScore, currentPB), webhook.previousPosition, webhook.previousPosition, webhook.ClubId);
-                WebhookSettings::webhooks[i].Send(pb, true);
-            }
-        }
-
-        if (previousScore > currentPB) {
+        if (send_pb_manual || previousScore > currentPB) {
             Log("New PB: " + previousScore + " -> " + currentPB);
             PB@ pb = PB(user, map, previousScore, currentPB);
             dictionary cache = dictionary();
@@ -116,7 +106,7 @@ void PBLoop()
                     }
 
                     Log("Club " + webhook.Name + " Position: " + webhook.previousPosition + " -> " + position);
-                    if (position < webhook.previousPosition) {
+                    if (send_pb_manual || position < webhook.previousPosition) {
                         cache[webhook.ClubId + ""] = @ClubPB(pb, webhook.previousPosition, position, webhook.ClubId);
                     } else {
                         cache[webhook.ClubId + ""] = null;
@@ -128,6 +118,7 @@ void PBLoop()
                 webhook.Send(cast<ClubPB@>(cache[webhook.ClubId + ""]));
             }
 
+            send_pb_manual = false;
             previousScore = currentPB;
         }
         sleep(1000);
