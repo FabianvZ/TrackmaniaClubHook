@@ -67,7 +67,7 @@ class ClubPB {
     Losers = beatenPlayers.Length > 0 ? beatenPlayers[beatenPlayers.Length - 1] : "";
     if (beatenPlayers.Length > 1) {
         beatenPlayers.RemoveLast();
-        Losers = string::Join(beatenPlayers, ", ") + " & " + Losers;
+        Losers = EscapeMarkdown(string::Join(beatenPlayers, ", ") + " & " + Losers);
     } 
 }
 
