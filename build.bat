@@ -1,6 +1,12 @@
 @echo off
 
-SET zip="C:\Program Files\7-Zip\7z.exe"
-SET name="DiscordRivalryPing.op"
-IF EXIST %name% DEL /F %name%
-%zip% a -mx9 -tzip %name% info.toml src LICENSE
+SET name=DiscordRivalryPing
+
+REM Delete old file
+IF EXIST %name%.op DEL /F %name%.op
+
+REM Create the ZIP
+powershell -Command "Compress-Archive -Path 'info.toml','API','Controller','Model','Render','Settings','ExtraLeaderboardPositions.as','README.md' -DestinationPath '%name%.zip' -CompressionLevel Optimal -Force"
+
+REM Rename to .op
+REN %name%.zip %name%.op
