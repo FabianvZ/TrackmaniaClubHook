@@ -6,7 +6,7 @@ REM Delete old file
 IF EXIST %name%.op DEL /F %name%.op
 
 REM Create the ZIP
-powershell -Command "Compress-Archive -Path 'info.toml','API','Controller','Model','Render','Settings','ExtraLeaderboardPositions.as','README.md' -DestinationPath '%name%.zip' -CompressionLevel Optimal -Force"
+powershell -Command "Compress-Archive -Path 'info.toml','LICENSE','src' -DestinationPath '%name%.zip' -CompressionLevel Optimal -Force"
 
 REM Rename to .op
 REN %name%.zip %name%.op
