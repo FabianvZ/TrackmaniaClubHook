@@ -15,7 +15,7 @@ class DiscordWebHook : WebRequest
         body["username"] = "Trackmania";
         body["avatar_url"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCHBYTbusq8rivJAHP59YQbUtiqoqpbiPUS2Mdxi_pDgiYqGtttj0sS3EO05JS6Xama2A&usqp=CAU";
         body["flags"] = 4096;
-        body["content"] = "# [" + clubPB.pb.User.Name + "](" + URL::TrackmaniaIOPlayer + clubPB.pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a " + ((improved)? "new" : "") + " PB " + Medal::ToDiscordString(clubPB.pb.Medal) + (improved? " beating " + clubPB.Losers : "");
+        body["content"] = "## [" + clubPB.pb.User.Name + "](" + URL::TrackmaniaIOPlayer + clubPB.pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a " + ((improved)? "new" : "") + " PB " + Medal::ToDiscordString(clubPB.pb.Medal) + "###" + (improved? " beating " + clubPB.Losers : "");
 
         body["embeds"] = Json::Array();
         body["embeds"].Add(Json::Object());
