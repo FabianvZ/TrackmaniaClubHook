@@ -67,6 +67,16 @@ void PBLoop()
 
             for (uint i = 0; i < WebhookSettings::webhooks.Length; i++)
             {
+                if (WebhookSettings::webhooks[i].ClubId == -1) {
+                    Notifications::ShowError("ClubId is not set for webhook " + WebhookSettings::webhooks[i].Name);
+                    continue; 
+                }
+
+                if (WebhookSettings::webhooks[i].WebhookUrl == "" || WebhookSettings::webhooks[i].WebhookUrl == DiscordDefaults::URL) {
+                    Notifications::ShowError("Webhook URL is not set for webhook " + WebhookSettings::webhooks[i].Name);
+                    continue;
+                }
+
                 WebhookSetting@ webhook = WebhookSettings::webhooks[i];
                 if (cache.Exists(webhook.ClubId + "")) {
                     if (cast<ClubPB@>(cache[webhook.ClubId + ""]) is null) {
