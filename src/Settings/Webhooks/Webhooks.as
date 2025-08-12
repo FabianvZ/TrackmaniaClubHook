@@ -54,7 +54,7 @@ namespace WebhookSettings {
                     import_webhook = "";
                     import_error_message = "";  
                     _webhooks.Add(@import_webhook_json);
-                    webhooks.InsertLast(WebhookSetting(@import_webhook_json));
+                    webhooks.InsertLast(@WebhookSetting(@import_webhook_json));
                 }
 
             }
