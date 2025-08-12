@@ -34,6 +34,9 @@ string settings_usernames = DiscordDefaults::usernames;
 [Setting hidden]
 bool send_grinding_stats = true;
 
+[Setting hidden]
+bool send_when_beating_noone = false;
+
 bool showImportPopup = false;
 string import_settings_usernames = "";
 string import_error_message = "";
@@ -51,6 +54,9 @@ void RenderDiscordSettings()
 #if DEPENDENCY_GRINDINGSTATS
     send_grinding_stats = UI::Checkbox("Send grinding stats", send_grinding_stats);
 #endif
+
+    send_when_beating_noone = UI::Checkbox("Send PB when beating no one", send_when_beating_noone);
+    UI::SetTooltip("Enable to send a message to Discord when you beat your own PB, even if you don't beat anyone else. This is useful for grinding.");
 
 #if !DEPENDENCY_DISCORD
     settings_discord_user_id = UI::InputText("Discord User-ID", settings_discord_user_id);

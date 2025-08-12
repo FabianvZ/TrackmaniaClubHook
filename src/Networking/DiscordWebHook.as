@@ -9,13 +9,14 @@ class DiscordWebHook : WebRequest
     string GetInterpolatedBody(ClubPB@ clubPB)
     {
         Map@ map = clubPB.pb.Map;
-        bool improved = clubPB.ClubPosition != clubPB.PreviousClubPosition;
+        bool improvedPosition = clubPB.ClubPosition != clubPB.PreviousClubPosition,
+            improvedTime = clubPB.pb.Score != clubPB.pb.PreviousScore;
 
         Json::Value@ body = Json::Object();
         body["username"] = "Trackmania";
         body["avatar_url"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCHBYTbusq8rivJAHP59YQbUtiqoqpbiPUS2Mdxi_pDgiYqGtttj0sS3EO05JS6Xama2A&usqp=CAU";
         body["flags"] = 4096;
-        body["content"] = "## [" + clubPB.pb.User.Name + "](" + URL::TrackmaniaIOPlayer + clubPB.pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a" + ((improved)? " new" : "") + " PB " + Medal::ToDiscordString(clubPB.pb.Medal) + (improved? " beating " + clubPB.Losers : "");
+        body["content"] = "## [" + clubPB.pb.User.Name + "](" + URL::TrackmaniaIOPlayer + clubPB.pb.User.Id + ") (<@" + settings_discord_user_id + ">) got a" + ((improvedTime)? " new" : "") + " PB " + Medal::ToDiscordString(clubPB.pb.Medal) + (clubPB.Losers.Length > 0? " beating " + clubPB.Losers : "");
 
         body["embeds"] = Json::Array();
         body["embeds"].Add(Json::Object());
@@ -34,7 +35,7 @@ class DiscordWebHook : WebRequest
             AddField(fields, "Resets", GrindingStats::GetSessionResets() + " / " + GrindingStats::GetTotalResets(), true);
         }
 #endif
-        AddField(fields, "Club Position", clubPB.PreviousClubPosition + (improved? " -> " + clubPB.ClubPosition : ""));
+        AddField(fields, "Club Position", clubPB.PreviousClubPosition + (improvedPosition? " -> " + clubPB.ClubPosition : ""));
         for (uint i = 0; i < clubPB.LeaderboardFragments.Length; i++) {
             AddField(fields, i == 0? "Leaderboard" : "\u200B", "```" + clubPB.LeaderboardFragments[i] + "```", settings_inline_columns);
         }

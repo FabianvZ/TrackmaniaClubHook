@@ -83,7 +83,7 @@ void PBLoop()
                     }
 
                     Log("Club " + webhook.Name + " Position: " + webhook.previousPosition + " -> " + position);
-                    if (send_pb_manual || position < webhook.previousPosition) {
+                    if (send_pb_manual || send_when_beating_noone || position < webhook.previousPosition) {
                         cache[webhook.ClubId + ""] = @ClubPB(pb, webhook.previousPosition, position, webhook.ClubId);
                     } else {
                         cache[webhook.ClubId + ""] = null;
