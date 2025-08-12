@@ -30,9 +30,8 @@ namespace WebhookSettings {
         UI::Separator();
         if (UI::Button(Icons::Plus + " Add a webhook"))
         {
-            Json::Value@ newWebhook = Json::Object();
-            _webhooks.Add(@newWebhook);
-            webhooks.InsertLast(@WebhookSetting(@newWebhook));
+            _webhooks.Add(Json::Object());
+            webhooks.InsertLast(@WebhookSetting(_webhooks[_webhooks.Length - 1]));
         }
 
         UI::SameLine();
@@ -53,8 +52,8 @@ namespace WebhookSettings {
                     showImportPopup = false;
                     import_webhook = "";
                     import_error_message = "";  
-                    _webhooks.Add(@import_webhook_json);
-                    webhooks.InsertLast(@WebhookSetting(@import_webhook_json));
+                    _webhooks.Add(import_webhook_json);
+                    webhooks.InsertLast(@WebhookSetting(_webhooks[_webhooks.Length - 1]));
                 }
 
             }
