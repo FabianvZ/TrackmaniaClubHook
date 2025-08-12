@@ -18,7 +18,7 @@ class WebhookSetting : JsonSetting {
     uint previousPosition;
 
     WebhookSetting(Json::Value@ data) {
-        super(data);
+        super(@data);
     }
 
     bool Draw() override {

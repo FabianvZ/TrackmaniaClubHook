@@ -7,30 +7,6 @@ void Main()
 	NadeoServices::AddAudience("NadeoLiveServices");
 #endif
 
-#if DEPENDENCY_DISCORD
-    if (settings_discord_user_id == "")
-    {
-        for (uint tries = 0; tries < 10; tries++)
-        {
-            if (Discord::IsReady())
-            {
-                string discordUserId = Discord::GetUser().ID;
-                DiscordDefaults::UserId = discordUserId;
-                settings_discord_user_id = discordUserId;
-                Log("Got Discord User!");
-                break;
-            }
-            Log("Tried to get Discord User - was not ready!");
-
-            sleep(500);
-        }
-    }
-#endif
-    Legacy::migrateOldWebhookSettings();
-
-    sendPBShortcut.key = togglePBKey;
-    forceSendShortcut.key = forceSendKey;
-    WebhookSettings::Initialize();
     startnew(PBLoop);
 }
 
