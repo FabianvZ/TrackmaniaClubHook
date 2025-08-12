@@ -86,6 +86,11 @@ class WebhookSetting : JsonSetting {
     }
 
     void Send(ClubPB@ pb, bool force = false) {
+        if (WebhookUrl == "" || WebhookUrl == DiscordDefaults::URL) {
+            Notifications::ShowError("Webhook URL is not set for webhook " + Name);
+            return;
+        }
+
         if (force || !Data.HasKey("Filters") || WebhookSettings::GetFilter(Data["Filters"]).Solve(pb)) {
             Net::HttpRequest@ response = DiscordWebHook(pb, WebhookUrl).Send();
 
