@@ -3,7 +3,7 @@ namespace TrackOfTheDay {
 
     bool IsTrackOfTheDay(Map@ map) {
         uint64 now = Time::get_Stamp();
-        if (_monthData is null || _monthData["nextRequestTimestamp"] <= now) {
+        if (_monthData is null || uint64(_monthData["nextRequestTimestamp"]) <= now) {
             @_monthData = Nadeo::LiveServiceRequest("/api/token/campaign/month?offset=0&length=1");
         }
 
