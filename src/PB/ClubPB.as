@@ -67,7 +67,7 @@ class ClubPB {
     Losers = beatenPlayers.Length > 0 ? beatenPlayers[beatenPlayers.Length - 1] : "";
     if (beatenPlayers.Length > 1) {
         beatenPlayers.RemoveLast();
-        Losers = EscapeMarkdown(string::Join(beatenPlayers, ", ") + " & " + Losers);
+        Losers = string::Join(beatenPlayers, ", ") + " & " + Losers;
     } 
 }
 
@@ -96,7 +96,7 @@ private string FormatLeaderBoardEntry(int position, const string &in username, u
                 return "<@" + nameParts[1] + ">";
             }
         }
-        return TMUsername;
+        return EscapeMarkdown(TMUsername);
     }
 
 }
