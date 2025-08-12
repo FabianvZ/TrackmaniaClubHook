@@ -82,7 +82,11 @@ class WebhookSetting : JsonSetting {
     }
 
     void UpdatePosition(Map@ map, uint score) {
-        previousPosition = GetClubLeaderboardPosition(map.Uid, score);
+        if (ClubId == -1) {
+            Notifications::ShowError("ClubId is not set for webhook " + Name);
+            return;
+        }
+        previousPosition = GetClubLeaderboardPosition(map.Uid, score)["position"];
     }
 
     void Send(ClubPB@ pb, bool force = false) {
@@ -106,12 +110,8 @@ class WebhookSetting : JsonSetting {
         }
     }
 
-    int GetClubLeaderboardPosition(const string &in mapUid, uint score) 
+    Json::Value@ GetClubLeaderboardPosition(const string &in mapUid, uint score) 
     {   
-        if (ClubId == -1) {
-            Notifications::ShowError("ClubId is not set for webhook " + Name);
-            return 0;
-        }
         Json::Value@ requestbody = Json::Object();
         requestbody["maps"] = Json::Array();
         Json::Value mapJson = Json::Object();
@@ -120,7 +120,7 @@ class WebhookSetting : JsonSetting {
         requestbody["maps"].Add(mapJson);
         Json::Value@ personalBest = Nadeo::LiveServicePostRequest("/api/token/leaderboard/group/map/club/" + ClubId + "?scores[" + mapUid +  "]=" + score, requestbody)[0];
         Log(Json::Write(personalBest));
-        return personalBest["position"];
+        return personalBest;
     }
 
 }
