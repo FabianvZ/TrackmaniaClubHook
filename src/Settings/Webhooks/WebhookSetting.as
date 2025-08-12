@@ -11,7 +11,7 @@ class WebhookSetting : JsonSetting {
     }
 
     int ClubId {
-        get { return Data.HasKey("ClubId")? Data["ClubId"] : Legacy::clubId; }
+        get { return Data.HasKey("ClubId")? Data["ClubId"] : -1; }
         set { Data["ClubId"] = value; }
     }
 
@@ -91,27 +91,20 @@ class WebhookSetting : JsonSetting {
 
             if (response.ResponseCode() < 200 || response.ResponseCode() >= 300)
             {
-                UI::ShowNotification(
-                        "Discord Rivalry Ping",
-                        "Sending to discord webhook failed.",
-                        UI::HSV(0.10f, 1.0f, 1.0f), 7500);
-                error("Sending message to hook was not successfull. Status:" + response.ResponseCode());
+                Notifications::ShowError("Sending message to hook was not successfull. Status:" + response.ResponseCode());
                 Log(response.Body);
-                Log("Length: " + response.Body.Length);
-                Log(response.Error());
-                Log(response.String());
             }
             else
             {
-                Log("Sent " + Name + " to Discord");
+                Log("Sent webhook " + Name + " to Discord");
             }
         }
     }
 
     int GetClubLeaderboardPosition(const string &in mapUid, uint score) 
-    {
-        if (ClubId == 0) {
-            error("ClubId is not set for webhook " + Name);
+    {   
+        if (ClubId == -1) {
+            Notifications::ShowError("ClubId is not set for webhook " + Name);
             return 0;
         }
         Json::Value@ requestbody = Json::Object();

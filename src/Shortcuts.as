@@ -55,16 +55,10 @@ Shortcut forceSendShortcut("force a message to Discord");
 void OnKeyPress(bool down, VirtualKey key) {
     if (sendPBShortcut.KeyPressed(down, key, togglePBKey)) {
         settings_SendPB = !settings_SendPB;
-        UI::ShowNotification(
-            "Discord Rivalry Ping",
-            "Toggled sending PBs to Discord: " + (settings_SendPB ? "Enabled" : "Disabled"),
-            UI::HSV(0.55f, 1.0f, 1.0f), 7500);
+        Notifications::ShowNotification("Toggled sending PBs to Discord: " + (settings_SendPB ? "Enabled" : "Disabled"));
     }
     if (forceSendShortcut.KeyPressed(down, key, forceSendKey)) {
         send_pb_manual = true;
-                UI::ShowNotification(
-            "Discord Rivalry Ping",
-            "Sending manual PB to Discord",
-            UI::HSV(0.55f, 1.0f, 1.0f), 7500);
+        Notifications::ShowNotification("Sending manual PB to Discord");
     }
 }

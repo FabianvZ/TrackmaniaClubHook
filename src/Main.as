@@ -77,7 +77,7 @@ void PBLoop()
                     Json::Value@ positionRequest = webhook.GetClubLeaderboardPosition(map.Uid, previousScore);
                     if (uint(positionRequest["score"]) == previousScore) {
                         webhook.previousPosition = positionRequest["position"];
-                        position = webhook.GetClubLeaderboardPosition(map.Uid, currentPB)["position"];
+                        position = webhook.GetClubLeaderboardPosition(map.Uid, currentPB);
                     } else {
                         position = positionRequest["position"];
                     }
