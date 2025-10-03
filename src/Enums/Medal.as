@@ -107,4 +107,19 @@ namespace Medal
         throw("Not implemented - Medal-int: " + value);
         return Medal::No;
     }
+
+    Medal GetReachedMedal(Map@ map, uint currentPB)
+    {
+#if DEPENDENCY_CHAMPIONMEDALS
+        if (currentPB <= map.ChampionMedalTime) return Medal::Champion;
+#endif
+#if DEPENDENCY_WARRIORMEDALS
+        if (currentPB <= map.WarriorMedalTime) return Medal::Warrior;
+#endif
+        if (currentPB <= map.AuthorMedalTime) return Medal::Author;
+        if (currentPB <= map.GoldMedalTime) return Medal::Gold;
+        if (currentPB <= map.SilverMedalTime) return Medal::Silver;
+        if (currentPB <= map.BronzeMedalTime) return Medal::Bronze;
+        return Medal::No;
+    }
 }

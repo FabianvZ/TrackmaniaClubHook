@@ -10,7 +10,7 @@ class PB
         @User = user;
         @Map = map;
         SetPBPosition(map.Uid, score);
-        Medal = GetReachedMedal(Map, score);
+        Medal = Medal::GetReachedMedal(Map, score);
         PreviousScore = previousScore;
         _score = score;
         Score = (score <= Map.AuthorMedalTime && Campaign::WeeklyShorts.IsCurrentCampaignMap(map)) ? -1 : score;
@@ -36,18 +36,4 @@ class PB
         return json["zones"].Length > index ? json["zones"][index]["ranking"]["position"] : 0;
     }
 
-    private Medal GetReachedMedal(Map@ map, uint currentPB)
-    {
-#if DEPENDENCY_CHAMPIONMEDALS
-        if (currentPB <= map.ChampionMedalTime) return Medal::Champion;
-#endif
-#if DEPENDENCY_WARRIORMEDALS
-        if (currentPB <= map.WarriorMedalTime) return Medal::Warrior;
-#endif
-        if (currentPB <= map.AuthorMedalTime) return Medal::Author;
-        if (currentPB <= map.GoldMedalTime) return Medal::Gold;
-        if (currentPB <= map.SilverMedalTime) return Medal::Silver;
-        if (currentPB <= map.BronzeMedalTime) return Medal::Bronze;
-        return Medal::No;
-    }
 }

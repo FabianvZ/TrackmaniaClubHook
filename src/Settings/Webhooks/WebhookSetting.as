@@ -15,6 +15,11 @@ class WebhookSetting : JsonSetting {
         set { Data["ClubId"] = value; }
     }
 
+    Triggers Trigger {
+        get { return Data.HasKey("Trigger")? Triggers::FromValue(int(Data["Trigger"])) : send_when_beating_noone? Triggers::Time : Triggers::Club; }
+        set { Data["Trigger"] = int(value); }
+    }
+
     uint previousPosition;
 
     WebhookSetting(Json::Value@ data) {
@@ -35,6 +40,18 @@ class WebhookSetting : JsonSetting {
 
         Name = UI::InputText("Name", Name);
         WebhookUrl = UI::InputText("WebhookUrl", WebhookUrl);
+
+        if (UI::BeginCombo("Trigger to send", Triggers::ToString(Trigger))) {
+            for (int i = 0; i < 3; i++) {
+                Triggers t = Triggers::FromValue(i);
+                if (UI::Selectable(Triggers::ToString(t), Trigger == t))
+                {
+                    Trigger = t;
+                    break;
+                }
+            }
+            UI::EndCombo();
+        }
 
         string currentClub;
         for (uint i = 0; WebhookSettings::clubs.HasKey("clubList") &&  i < WebhookSettings::clubs["clubList"].Length; i++)

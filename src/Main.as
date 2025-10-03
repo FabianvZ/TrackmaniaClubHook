@@ -113,8 +113,9 @@ void PBLoop()
                     }
 
                     Log("Club " + webhook.Name + " Position: " + webhook.previousPosition + " -> " + position);
-                    if (send_pb_manual || send_when_beating_noone || position < webhook.previousPosition) {
-                        cache[webhook.ClubId + ""] = @ClubPB(pb, webhook.previousPosition, position, webhook.ClubId);
+                    ClubPB@ clubPB = ClubPB(pb, webhook.previousPosition, position, webhook.ClubId);
+                    if (send_pb_manual || Triggers::IsTriggered(@clubPB, webhook.Trigger)) {
+                        cache[webhook.ClubId + ""] = @clubPB;
                     } else {
                         cache[webhook.ClubId + ""] = null;
                         continue; // Skipping because the clubpb is not improved
