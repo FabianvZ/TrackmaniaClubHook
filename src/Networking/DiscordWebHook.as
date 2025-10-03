@@ -26,7 +26,7 @@ class DiscordWebHook : WebRequest
 
         Json::Value@ fields = Json::Array();
         AddField(fields, "Map", "[" + map.CleansedName + "](" + URL::TrackmaniaIOLeaderboard + map.Uid + ") by [" + map.AuthorName + "](" + URL::TrackmaniaIOPlayer + map.AuthorLogin + ")");
-        AddField(fields, "Time", "" + (clubPB.pb.Score == uint(-1) ? "Secret" : Time::Format(clubPB.pb.Score)) + (clubPB.pb.PreviousScore == uint(-1) || clubPB.pb.Score == uint(-1) ? "" : " (-" + Time::Format(clubPB.pb.PreviousScore - clubPB.pb.Score) + ")"), true);
+        AddField(fields, "Time", "" + (clubPB.pb.Score == uint(-1) ? "Secret" : Time::Format(clubPB.pb.Score)) + (clubPB.pb.PreviousScore == uint(-1) || clubPB.pb.Score == uint(-1) || !improvedTime ? "" : " (-" + Time::Format(clubPB.pb.PreviousScore - clubPB.pb.Score) + ")"), true);
         AddField(fields, "Rank", "" + clubPB.pb.WorldPosition, true);
 #if DEPENDENCY_GRINDINGSTATS
         if (send_grinding_stats) {
