@@ -20,21 +20,14 @@ class RankFilter : OrdinalWebhookFilter {
 
         UI::SetNextItemWidth(110.0f);
         if (UI::BeginCombo("##RankZone" + label, RankZones::ToString(RankZone))) {
-            if (UI::Selectable(RankZones::ToString(RankZones::Club), RankZone == RankZones::Club))
+            for (int i = 0; i < 5; i++)
             {
-                RankZone = RankZones::Club;
-            } else if (UI::Selectable(RankZones::ToString(RankZones::World), RankZone == RankZones::World))
-            {
-                RankZone = RankZones::World;
-            } else if (UI::Selectable(RankZones::ToString(RankZones::Continent), RankZone == RankZones::Continent))
-            {
-                RankZone = RankZones::Continent;
-            } else if (UI::Selectable(RankZones::ToString(RankZones::Country), RankZone == RankZones::Country))
-            {
-                RankZone = RankZones::Country;
-            } else if (UI::Selectable(RankZones::ToString(RankZones::Province), RankZone == RankZones::Province))
-            {
-                RankZone = RankZones::Province;
+                RankZones t = RankZones::FromValue(i);
+                if (UI::Selectable(RankZones::ToString(t), RankZone == t))
+                {
+                    RankZone = t;
+                    break;
+                }
             }
             UI::EndCombo();
         }

@@ -17,19 +17,15 @@ class MapNameFilter : WebhookFilterElement {
     void DrawSettings() override {
         UI::SetNextItemWidth(145.0f);
         if (UI::BeginCombo("##MapFilters" + label, StringComparisons::ToString(MapFilters))) {
-            if (UI::Selectable(StringComparisons::ToString(StringComparisons::Contains), MapFilters == StringComparisons::Contains))
+            for (int i = 0; i < 4; i++)
             {
-                MapFilters = StringComparisons::Contains;
-            } else if (UI::Selectable(StringComparisons::ToString(StringComparisons::DoesNotContain), MapFilters == StringComparisons::DoesNotContain))
-            {
-                MapFilters = StringComparisons::DoesNotContain;
-            } else if (UI::Selectable(StringComparisons::ToString(StringComparisons::Is), MapFilters == StringComparisons::Is))
-            {
-                MapFilters = StringComparisons::Is;
-            } else if (UI::Selectable(StringComparisons::ToString(StringComparisons::IsNot), MapFilters == StringComparisons::IsNot))
-            {
-                MapFilters = StringComparisons::IsNot;
-            } 
+                StringComparisons t = StringComparisons::FromValue(i);
+                if (UI::Selectable(StringComparisons::ToString(t), MapFilters == t))
+                {
+                    MapFilters = t;
+                    break;
+                }
+            }
             UI::EndCombo();
         }
         UI::SameLine();

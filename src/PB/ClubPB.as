@@ -36,7 +36,7 @@ class ClubPB {
         array<string> beatenPlayers = {};
         array<string> allEntries; 
 
-        for (uint i = 0; i < Math::Max(leaderboard.Length, ClubPosition); i++) {
+        for (uint i = 0; i < uint(Math::Max(leaderboard.Length, ClubPosition)); i++) {
             if (i == ClubPosition - 1) {
                 allEntries.InsertLast(FormatLeaderBoardEntry(position++, pb.User.Name, pb.Score, maxUsernameLength));
             }
