@@ -41,7 +41,7 @@ class WebhookSetting : JsonSetting {
         Name = UI::InputText("Name", Name);
         WebhookUrl = UI::InputText("WebhookUrl", WebhookUrl);
 
-        if (UI::BeginCombo("Trigger to send", Triggers::ToString(Trigger))) {
+        if (UI::BeginCombo("When to send", Triggers::ToString(Trigger))) {
             for (int i = 0; i < 3; i++) {
                 Triggers t = Triggers::FromValue(i);
                 if (UI::Selectable(Triggers::ToString(t), Trigger == t))

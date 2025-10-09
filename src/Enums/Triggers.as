@@ -9,11 +9,11 @@ namespace Triggers {
     string ToString(Triggers t) {
         switch (t) {
             case Triggers::Club:
-                return "Club Position";
+                return "Improved Club Position";
             case Triggers::Medal:
-                return "Medal";
+                return "Improved Medal";
             case Triggers::Time:
-                return "Time";
+                return "Improved Time";
         }
 
         throw("Not implemented - Trigger: " + t);
