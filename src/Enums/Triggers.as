@@ -37,7 +37,7 @@ namespace Triggers {
     bool IsTriggered(ClubPB@ pb, Triggers trigger) {
         switch (trigger) {
             case Triggers::Club:
-                return pb.ClubPosition != pb.PreviousClubPosition;
+                return pb.ClubPosition < pb.PreviousClubPosition;
             case Triggers::Medal:
                 return pb.pb.Medal != Medal::GetReachedMedal(pb.pb.Map, pb.pb.PreviousScore);
             case Triggers::Time:
