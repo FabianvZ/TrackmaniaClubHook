@@ -2,7 +2,7 @@
 name        = "Discord Rivalry Ping"
 author      = "FabianvZ, Lokulicious"
 category    = "Utilities"
-version     = "1.2.0"
+version     = "1.2.1"
 
 [script]
 dependencies = [ "NadeoServices" ]
