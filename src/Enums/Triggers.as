@@ -11,7 +11,7 @@ namespace Triggers {
             case Triggers::Club:
                 return "Improved Club Position";
             case Triggers::Medal:
-                return "Improved Medal";
+                return "Improved Medal or Club Position";
             case Triggers::Time:
                 return "Improved Time";
         }
@@ -35,11 +35,12 @@ namespace Triggers {
     }
 
     bool IsTriggered(ClubPB@ pb, Triggers trigger) {
+        if (pb.ClubPosition < pb.PreviousClubPosition) {
+            return true;
+        }
         switch (trigger) {
-            case Triggers::Club:
-                return pb.ClubPosition < pb.PreviousClubPosition;
             case Triggers::Medal:
-                return pb.pb.Medal != Medal::GetReachedMedal(pb.pb.Map, pb.pb.PreviousScore);
+                return pb.pb.Medal > Medal::GetReachedMedal(pb.pb.Map, pb.pb.PreviousScore);
             case Triggers::Time:
                 return pb.pb.Score < pb.pb.PreviousScore;
         }
