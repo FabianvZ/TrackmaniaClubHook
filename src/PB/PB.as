@@ -13,9 +13,22 @@ class PB
         Medal = Medal::GetReachedMedal(Map, score);
         PreviousScore = previousScore;
         _score = score;
-        Score = (score <= Map.AuthorMedalTime && Campaign::WeeklyShorts.IsCurrentCampaignMap(map)) ? -1 : score;
+        Score = IsSecretTime(map, score) ? -1 : score;
     }
 
+    private bool IsSecretTime(Map@ map, uint score)
+    {
+        if (score <= Map.AuthorMedalTime && Campaign::WeeklyShorts.IsCurrentCampaignMap(map))
+            return true;
+
+        // seemingly there's no nice global way of determining whether your pb is secret. if a record belongs to the authenticated account, the time is revealed.
+        // to work around that, check if the time below our pb is secret. if yes, then ours is too
+        if (Leaderboard::IsLeaderboardTimeBelowSecret(map.Uid, score))
+            return true;
+
+        return false;
+    }
+    
     private void SetPBPosition(const string &in mapUid, uint time)
     {
         Json::Value@ requestbody = Json::Object();

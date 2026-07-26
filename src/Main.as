@@ -74,6 +74,10 @@ void PBLoop()
             {
                 WebhookSettings::webhooks[i].UpdatePosition(map, previousScore);
             }
+
+            // pre-check if the time below our pb is secret to work around the 'barely pbed' issue noted in IsLeaderboardTimeBelowSecret
+            Leaderboard::IsLeaderboardTimeBelowSecret(map.Uid, previousScore);
+            
             continue;
         }
 
